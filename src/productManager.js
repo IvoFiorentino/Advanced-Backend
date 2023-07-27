@@ -1,5 +1,6 @@
 const fs = require('fs');
-const filePath = 'products.json';
+const filePath = ('../products.json');
+// const allProducts = filePath;
 
 // Verifica si el archivo existe
 if (!fs.existsSync(filePath)) {
@@ -85,13 +86,13 @@ class ProductManager {
   // Método para traer el listado de productos.
   async getProducts() {
     await this.loadProducts();
-    return this.products;
+    return this.allProducts;
   }
 
   // Método para obtener un producto por su ID.
   async getProductById(id) {
     await this.loadProducts();
-    const product = this.products.find((p) => p.id === id);
+    const product = this.allProducts.find((product) => product.id === pid);
     if (product) {
       return product;
     } else {
@@ -137,6 +138,8 @@ class ProductManager {
     }
   }
 }
+
+module.exports = ProductManager;
 
 // Testing
 

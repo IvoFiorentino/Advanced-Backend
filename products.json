@@ -9,7 +9,7 @@
     "id": 1
   },
   {
-    "title": "Producto 3",
+    "title": "Producto 2",
     "description": "Descripción del producto 2",
     "price": 4000,
     "thumbnail": "Sin imagen",
@@ -27,7 +27,7 @@
     "id": 3
   },
   {
-    "title": "Producto ACTUALIZADO",
+    "title": "Producto 4",
     "description": "Descripción del producto 4",
     "price": 700.2,
     "thumbnail": "Sin imagen",
