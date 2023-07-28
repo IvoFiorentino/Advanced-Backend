@@ -1,6 +1,6 @@
 const fs = require('fs');
-const filePath = ('../products.json');
-// const allProducts = filePath;
+const { stringify } = require('querystring');
+const filePath = ('products.json');
 
 // Verifica si el archivo existe
 if (!fs.existsSync(filePath)) {
@@ -13,7 +13,6 @@ class ProductManager {
     this.path = filePath;
     this.products = [];
     this.lastProductId = 0;
-    this.loadProducts();
   }
 
   // Carga los productos existentes
@@ -86,13 +85,13 @@ class ProductManager {
   // Método para traer el listado de productos.
   async getProducts() {
     await this.loadProducts();
-    return this.allProducts;
+    return filePath;
   }
 
   // Método para obtener un producto por su ID.
   async getProductById(id) {
     await this.loadProducts();
-    const product = this.allProducts.find((product) => product.id === pid);
+    const product = this.products.find((product) => product.id === id); // El parámetro debe ser "id" en lugar de "pid"
     if (product) {
       return product;
     } else {
