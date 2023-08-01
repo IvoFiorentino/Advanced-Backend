@@ -1,5 +1,4 @@
 import express from 'express';
-import { ProductManager } from '../src/productManager.js';
 import productsRouter from '../src/routes/products.router.js'; 
 import cartsRouter from '../src/routes/cart.router.js'; 
 
@@ -9,21 +8,21 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-const allProducts = new ProductManager('./products.json');
+//ROUTES//
 
-//Mensaje de bienvenida al acceder a la raíz de la app
+// Welcome view
 app.get('/', (req, res) => {
   res.send('Hello World :)');
 });
 
-
+// Products Routes
 app.use('/api/products', productsRouter);
 
-
+//Carts Routes
 app.use('/api/carts', cartsRouter);
 
 
 app.listen(PORT, () => {
-  console.log(`Servidor Express escuchando en el puerto ${PORT}`);
+  console.log(`Server is up on ${PORT}`);
 });
 

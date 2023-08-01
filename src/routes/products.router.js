@@ -1,4 +1,3 @@
-//Router to handle all the endpoints associated with the products.
 import { Router } from "express";
 import { ProductManager } from "../productManager.js";
 
@@ -56,7 +55,7 @@ router.post('/', (req, res) => {
 });
 
 
-// Endpoint PUT /api/products/:pid   (Actualizará un producto)
+// Endpoint PUT /api/products/:pid   
 router.put('/:pid', async (req, res) => {
   const productId = parseInt(req.params.pid);
   const updatedFields = req.body; 
@@ -65,7 +64,7 @@ router.put('/:pid', async (req, res) => {
 });
 
 
-// Endpoint DELETE /api/products/:pid (Eliminará un producto)
+// Endpoint DELETE /api/products/:pid 
 router.delete('/:pid', async (req, res) => {
   const productId = parseInt(req.params.pid);
   await allProducts.deleteProduct(productId);

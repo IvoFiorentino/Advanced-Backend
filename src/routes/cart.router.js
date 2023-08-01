@@ -1,19 +1,20 @@
+//Router para manejar todos los endpoint asociados a los Carritos.
 import { Router } from 'express';
-import { CartManager } from "../cartManager.js";
+import { CartManager } from '../cartManager.js';
 
 const router = Router();
-const allCarts = new CartManager ('./cart.json');
+const newCarts = new CartManager('./carts.json');
 
 // Endpoint POST /api/carts (Creará un nuevo carrito)
 router.post('/', (req, res) => {
-  const newCart = allCarts.createCart();
+  const newCart = newCarts.createCart();
   res.status(201).json(newCart);
 });
 
 // Endpoint GET /api/carts/:cid (Listará los productos de un carrito, si no hay productos traerá un array vacío)
 router.get('/:cid', async (req, res) => {
   const cartId = parseInt(req.params.cid);
-  const cart = await allCarts.getCartById(cartId);
+  const cart = await newCarts.getCartById(cartId);
 
   if (!cart) {
     return res.status(404).json({ error: 'Carrito no encontrado' });
@@ -32,7 +33,7 @@ router.post('/:cid/product/:pid', async (req, res) => {
     return res.status(400).json({ error: 'Cantidad no válida' });
   }
 
-  const cart = allCarts.addProductToCart(cartId, productId, quantity);
+  const cart = newCarts.addProductToCart(cartId, productId, quantity);
   if (!cart) {
     return res.status(404).json({ error: 'Carrito no encontrado' });
   }
