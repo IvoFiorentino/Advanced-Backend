@@ -28,10 +28,10 @@ class CartManager {
     
         this.saveCarts(this.carts)
           .then(() => {
-            console.log(`Carrito creado, su ID es: ${newCart.id}`);
+            console.log(`Cart created with id ${newCart.id}`);
           })
           .catch((error) => {
-            console.log('Error al guardar los carritos', error.message);
+            console.log('Error saving cart', error.message);
           });
     
         return newCart;
@@ -44,7 +44,7 @@ class CartManager {
       this.carts = JSON.parse(data);
       this.updateLastCartId();
     } catch (error) {
-      throw new Error('Error al cargar carritos: ' + error.message);
+      throw new Error('Error loading carts ' + error.message);
     }
   }
 
@@ -53,9 +53,9 @@ class CartManager {
     try {
       const newData = JSON.stringify(data, null, 2);
       await fs.promises.writeFile(this.path, newData, 'utf-8');
-      console.log('Se guardaron los carritos', this.path);
+      console.log('Carts saved', this.path);
     } catch (error) {
-      throw new Error('Error al guardar los carritos: ' + error.message);
+      throw new Error('Error saving cart: ' + error.message);
     }
   }
 
@@ -73,7 +73,7 @@ class CartManager {
     if (cart) {
       return cart;
     } else {
-      throw new Error('Carrito no encontrado');
+      throw new Error('Cart not found');
     }
   }
 
