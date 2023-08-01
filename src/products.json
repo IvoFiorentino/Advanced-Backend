@@ -54,12 +54,12 @@
       "id": 6
     },
     {
-      "title": "Producto prueba 7",
-      "description": "Descripción del producto prueba 7",
-      "price": 1400.99,
+      "title": "Producto 7 a 0",
+      "description": "Descripción del clasico ganado",
+      "price": 777,
       "thumbnail": "Sin imagen",
       "code": "Product7",
-      "stock": 28,
+      "stock": 7,
       "id": 7
     },
     {

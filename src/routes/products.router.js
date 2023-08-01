@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { ProductManager } from "../productManager.js";
+import { ProductManager } from "../controllers/productManager.js";
 
 const router = Router();
-const allProducts = new ProductManager('./products.json');
+const allProducts = new ProductManager('products.json');
 
 //Endpoint GET /api/products (It will list all the products)
 router.get('/', async (req, res) => {
