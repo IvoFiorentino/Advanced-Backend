@@ -1,6 +1,6 @@
 # Advanced-Backend
 
-![Banner](img/colors.jpeg)
+![Banner](img/Colors.jpg)
 
 Repo created for CH purposes
 
