@@ -1,18 +1,16 @@
 {
-  "name": "entrega",
+  "name": "backend-avanzado3rd",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "type": "module",
+  "main": "",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "nodemon app.js"
   },
-  "keywords": [],
-  "author": "",
+  "author": "Ivo Fiorentino",
   "license": "ISC",
+  "keywords": [],
+  "description": "",
   "dependencies": {
     "express": "^4.18.2"
-  },
-  "devDependencies": {
-    "nodemon": "^3.0.1"
   }
 }
