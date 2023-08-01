@@ -1,49 +1,29 @@
-const express = require('express');
-const ProductManager = require('./productManager');
+import express from 'express';
+import { ProductManager } from '../src/productManager.js';
+import productsRouter from '../src/routes/products.router.js'; 
+import cartsRouter from '../src/routes/cart.router.js'; 
 
-const app = express();
 const PORT = 8080;
-
-const allProducts = new ProductManager('products.json');
+const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.listen(PORT, () => {
-  console.log('Servidor corriendo en el puerto 8080');
-});
+const allProducts = new ProductManager('./products.json');
 
+//Mensaje de bienvenida al acceder a la raíz de la app
 app.get('/', (req, res) => {
-  res.send('hola funciono');
-});
-
-app.get('/products', (req, res) => {
-  const limit = req.query.limit;
-  const products = allProducts.getProducts().slice(0, limit);
-  res.json(products);
-});
-
-app.get('/api/products', async (req, res) => {
-  try {
-    const products = await allProducts.getProducts();
-    res.status(200).send({ message: 'products', products });
-  } catch (error) {
-    res.status(500).json({ error });
-  }
-});
-
-app.get('/api/products/:pid', async (req, res) => {
-  const { pid } = req.params;
-  try {
-    const product = await allProducts.getProductById(parseInt(pid));
-    res.status(200).json({ message: 'product', product });
-  } catch (error) {
-    res.status(500).json({ error });
-  }
+  res.send('Hello World :)');
 });
 
 
+app.use('/api/products', productsRouter);
 
 
+app.use('/api/carts', cartsRouter);
 
+
+app.listen(PORT, () => {
+  console.log(`Servidor Express escuchando en el puerto ${PORT}`);
+});
 

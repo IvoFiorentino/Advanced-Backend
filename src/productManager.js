@@ -1,11 +1,10 @@
-const fs = require('fs');
-const { stringify } = require('querystring');
-const filePath = ('products.json');
+import fs from 'fs';
+const filePath = 'products.json';
 
-// Verifica si el archivo existe
+// It verifies that the files exist
 if (!fs.existsSync(filePath)) {
   fs.writeFileSync(filePath, '[]', 'utf-8');
-  console.log(`Se ha creado el archivo ${filePath}`);
+  console.log(`${filePath} file created`);
 }
 
 class ProductManager {
@@ -13,33 +12,34 @@ class ProductManager {
     this.path = filePath;
     this.products = [];
     this.lastProductId = 0;
+    this.loadProducts();
   }
 
-  // Carga los productos existentes
+  // If the products exist load them
   async loadProducts() {
     try {
       const data = await fs.promises.readFile(this.path, 'utf-8');
       this.products = JSON.parse(data);
       this.updateLastProductId();
     } catch (error) {
-      console.log('Error al cargar productos', error.message);
-      return null;
+      console.log('Error loading products', error.message);
+      throw new Error('Error loading products');
     }
   }
 
-  // Guarda los productos en el archivo.
+  // Save all products 
   async saveProducts(data) {
     try {
-      const newData = JSON.stringify(this.products, null, 2);
+      const newData = JSON.stringify(data, null, 2);
       await fs.promises.writeFile(this.path, newData, 'utf-8');
-      console.log('Se guardaron los productos', this.path);
+      console.log('the products were saved', this.path);
     } catch (error) {
-      console.log('Error al guardar los productos', error.message);
-      return null;
+      console.log('Error saving products', error.message);
+      throw new Error('Error saving products');
     }
   }
 
-  // Actualiza el ID
+  // Update the id
   updateLastProductId() {
     if (this.products.length > 0) {
       const lastProduct = this.products[this.products.length - 1];
@@ -47,183 +47,103 @@ class ProductManager {
     }
   }
 
-  // Valida que todos los campos del producto estén completos y sean válidos.
+  // Verifies that all items camps are completed.
   addProduct(product) {
     if (
       !product.title ||
       !product.description ||
       !product.price ||
-      !product.thumbnail ||
       !product.code ||
-      !product.stock
+      !product.stock ||
+      !product.category
     ) {
-      console.log('Debes completar todos los campos.');
-      return;
+      console.log('All fields are required');
+      throw new Error('incomplete fields');
     }
 
-    // Validación para que no se admita un código repetido.
+    // Validation of non repeated item
     if (this.products.some((p) => p.code === product.code)) {
-      console.log(`Ya existe un producto con el código ${product.code}.`);
-      return;
+      console.log(`There is already a product with this code ${product.code}.`);
+      throw new Error('This product already exists');
     }
+
+    // Increase id 
+    const newProduct = {
+      ...product,
+      id: this.lastProductId + 1,
+      status: true, 
+      category: product.category,
+    };
 
     this.lastProductId++;
-    product.id = this.lastProductId;
-    this.products.push(product);
+    this.products.push(newProduct);
 
     this.saveProducts(this.products)
       .then(() => {
-        console.log(`Producto agregado: ${product.title}`);
+        console.log(`Product added: ${newProduct.title}`);
       })
       .catch((error) => {
-        console.log('Error al guardar los productos', error.message);
+        console.log('Error saving product ', error.message);
+        throw new Error('Error saving product');
       });
 
-    return product;
+    return newProduct;
   }
 
-  // Método para traer el listado de productos.
+  // Get list of Item Method
   async getProducts() {
     await this.loadProducts();
-    return filePath;
+    return this.products;
   }
 
-  // Método para obtener un producto por su ID.
+  // Find Item by id Method
   async getProductById(id) {
     await this.loadProducts();
-    const product = this.products.find((product) => product.id === id); // El parámetro debe ser "id" en lugar de "pid"
+    const product = this.products.find((p) => p.id === id);
     if (product) {
       return product;
     } else {
-      console.log('Producto no encontrado');
+      console.log('Product not found');
       return null;
     }
   }
 
-  // Método para actualizar el campo TITLE del producto.
-  async updateProduct(id, updatedTitle) {
+  // Update Item Method
+  async updateProduct(id, updatedFields) {
     const productToUpdate = this.products.find((p) => p.id === id);
     if (!productToUpdate) {
-      console.log(`Producto con id ${id} no encontrado`);
+      console.log(`Product id ${id} not founded`);
       return;
     }
 
-    productToUpdate.title = updatedTitle;
+    Object.assign(productToUpdate, updatedFields);
 
     await this.saveProducts(this.products)
       .then(() => {
-        console.log(`Se actualiza el producto: ${JSON.stringify(productToUpdate)}`);
+        console.log(`Update product: ${JSON.stringify(productToUpdate)}`);
       })
       .catch((error) => {
-        console.log('Error al guardar los productos', error.message);
+        console.log('Error saving product', error.message);
       });
   }
 
-  // Método para buscar un producto y eliminarlo según su index.
+  // Delete Item Method
   async deleteProduct(id) {
     const index = this.products.findIndex((p) => p.id === id);
     if (index !== -1) {
       const deletedProduct = this.products.splice(index, 1)[0];
       await this.saveProducts(this.products)
         .then(() => {
-          console.log(`Producto eliminado: ${deletedProduct.title}`);
+          console.log(`Deleted product: ${deletedProduct.title}`);
         })
         .catch((error) => {
-          console.log('Error al guardar los productos', error.message);
+          console.log('Error saving products', error.message);
         });
     } else {
-      console.log('Producto no encontrado.');
+      console.log('Product not founded');
       return null;
     }
   }
 }
 
-module.exports = ProductManager;
-
-// Testing
-
-// async function testing() {
-//   const productManagerInstance = new ProductManager(filePath);
-
-//   console.log("getProducts inicial:", await productManagerInstance.getProducts());
-
-//   // // Se adicionan los productos.
-//   // await productManagerInstance.addProduct({
-//   //   title: "Producto prueba 1",
-//   //   description: "Descripción del producto prueba  1",
-//   //   price: 1500.00,
-//   //   thumbnail: "Sin imagen",
-//   //   code: "Product1",
-//   //   stock: 11,
-//   //   id: null // El ID se generará automáticamente
-//   // });
-
-//   // await productManagerInstance.addProduct({
-//   //   title: "Producto prueba 2",
-//   //   description: "Descripción del producto prueba 2",
-//   //   price: 700.20,
-//   //   thumbnail: "Sin imagen",
-//   //   code: "Product2",
-//   //   stock: 15,
-//   //   id: null // El ID se generará automáticamente
-//   // });
-
-//   // await productManagerInstance.addProduct({
-//   //   title: "Producto prueba 3",
-//   //   description: "Descripción del producto prueba 3",
-//   //   price: 1400.99,
-//   //   thumbnail: "Sin imagen",
-//   //   code: "Product3",
-//   //   stock: 28,
-//   //   id: null // El ID se generará automáticamente
-//   // });
-
-//   console.log("getProducts después de agregar los productos:", await productManagerInstance.getProducts());
-
-//   // Se llama al ID de un producto que no existe para que arroje error.
-//   const nonExistentProduct = await productManagerInstance.getProductById(10);
-//   console.log("Producto no encontrado");
-
-//   // Obtener los productos iniciales (siempre que el archivo de productos no exista, traerá el array vacío)
-//   const initialProducts = await productManagerInstance.getProducts();
-//   console.log("Listado de productos iniciales:", initialProducts);
-
-//   // // Agregar un nuevo producto
-//   // const newProduct = {
-//   //   title: "Producto prueba 4",
-//   //   description: "Descripción del producto prueba 4",
-//   //   price: 4000.00,
-//   //   thumbnail: "Sin imagen",
-//   //   code: "Product4",
-//   //   stock: 10,
-//   // };
-//   // await productManagerInstance.addProduct(newProduct);
-
-//   // Obtener los productos tras agregar uno nuevo
-//   const productsAfterAdd = await productManagerInstance.getProducts();
-//   console.log("Listado de productos tras agregar un producto nuevo:", productsAfterAdd);
-
-//   // Obtención producto por ID
-//   const productId = 2; // Acá se ingresa el ID del producto que se quiere buscar
-//   const productById = await productManagerInstance.getProductById(productId);
-//   console.log(`Usted buscó el producto cuyo ID es: ${productId}`);
-//   console.log("Producto encontrado:", productById);
-
-//   // Actualizar TITLE del producto, identificándolo por ID
-//   const productIdToUpdate = 4; // Acá se ingresa el ID del producto a actualizar
-//   await productManagerInstance.updateProduct(productIdToUpdate, "Producto ACTUALIZADO");
-
-//   // Obtener los productos tras actualizar uno
-//   const productsAfterUpdate = await productManagerInstance.getProducts();
-//   console.log("Listado de productos tras de actualizar un producto:", productsAfterUpdate);
-
-//   // Eliminar un producto por su ID
-//   const productIdToDelete = 2; // Aquí se ingresa ID del producto a eliminar
-//   await productManagerInstance.deleteProduct(productIdToDelete);
-
-//   // Obtener los productos después de eliminar uno
-//   const productsAfterDelete = await productManagerInstance.getProducts();
-//   console.log("Listado de productos tras eliminar un producto:", productsAfterDelete);
-// }
-
-// // testing();
+export { ProductManager };
