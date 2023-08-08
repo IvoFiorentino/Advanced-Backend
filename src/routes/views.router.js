@@ -17,13 +17,13 @@ router.get('/', async (req, res) => {
 router.get('/realtimeproducts', async (req, res) => {
     try {
         const products = await productManagerInstance.getProducts();
-        res.render('timeProducts', { products }); 
+        res.render('productsTime', { products }); 
     } catch (error) {
         res.status(500).json({ error: 'Error cannot get product list' });
     }
 });
 
-  router.delete('/api/views/delete/:id', async (req, res) => {
+router.delete('/api/views/delete/:id', async (req, res) => {
     const productId = parseInt(req.params.id);
 
     try {

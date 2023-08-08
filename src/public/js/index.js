@@ -3,7 +3,7 @@ const socketClient = io();
 
 //The event is configured to show the message when the connection is established.
 socketClient.on('connect', () => {
-  console.log('Conectado al servidor de WebSocket');
+  console.log('Connected to Websocket server');
 });
 
 //Event that receives the data from the server to then create a new product with the information entered and display it in the list.

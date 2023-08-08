@@ -10,7 +10,7 @@ router.get('/', async (req, res) => {
     const products = await allProducts.getProducts();
     const limit = req.query.limit ? parseInt(req.query.limit) : null;
     const response = limit ? products.slice(0, limit) : products;
-    res.json(response);
+    res.json(res);
   } catch (error) {
     res.status(500).json({ error: 'Error getting product list' });
   }

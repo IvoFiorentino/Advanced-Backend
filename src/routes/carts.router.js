@@ -2,18 +2,18 @@ import { Router } from 'express';
 import { CartManager } from '../controllers/cartManager.js';
 
 const router = Router();
-const newCarts = new CartManager('carts.json');
+const cartManagerAdapter = new CartManager('carts.json');
 
 // Endpoint POST /api/carts (Create new cart)
 router.post('/', (req, res) => {
-  const newCart = newCarts.createCart();
+  const newCart = cartManagerAdapter.createCart();
   res.status(201).json(newCart);
 });
 
 // Endpoint GET /api/carts/:cid (It list all products from cart, if doesn´t exist then create a empty array)
 router.get('/:cid', async (req, res) => {
   const cartId = parseInt(req.params.cid);
-  const cart = await newCarts.getCartById(cartId);
+  const cart = await cartManagerAdapter.getCartById(cartId);
 
   if (!cart) {
     return res.status(404).json({ error: 'Cart not found' });
@@ -32,7 +32,7 @@ router.post('/:cid/product/:pid', async (req, res) => {
     return res.status(400).json({ error: 'No valid' });
   }
 
-  const cart = newCarts.addProductToCart(cartId, productId, quantity);
+  const cart = cartManagerAdapter.addProductToCart(cartId, productId, quantity);
   if (!cart) {
     return res.status(404).json({ error: 'Cart not found' });
   }
