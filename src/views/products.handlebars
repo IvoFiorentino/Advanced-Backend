@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Products</title>
+</head>
+<body>
+  <h1>List of Products</h1>
+   <a href="/"><button>Home</button></a>
+  <ul>
+<ul>
+  {{#each products}}
+    <li>
+      <h2>Product Name: {{this.title}}</h2>
+      <p>Price: {{this.price}}</p>
+      <p>Category: {{this.category}}</p>
+      <button class="view-details-button" data-product-id={{this._id}}>View Details</button>
+      <button class="add-to-cart-button" data-product-id={{this._id}}>Add to Cart</button>
+    </li>
+  {{/each}}
+</ul>
+
+  
+  {{#if totalPages}}
+    <p>Page {{page}} of {{totalPages}}</p>
+    {{#if prevLink}}
+      <a href={{prevLink}}>Previous Page</a>
+    {{/if}}
+    {{#if nextLink}}
+      <a href={{nextLink}}>Next Page</a>
+    {{/if}}
+  {{/if}}
+
+<script>
+  function viewDetails(productId) {
+    window.location.href = `/api/views/products/${productId}`;
+  }
+
+  function addToCart(productId) {
+    fetch(`/api/carts/${cartId}/product/${productId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ quantity: 1 }), // Temporary until we have a view with a field to enter quantity, adding one at a time for now
+    })
+      .then(function(response) {
+        return response.json();
+      })
+      .then(function(cart) {
+
+        console.log('Product added to cart', cart);
+      })
+      .catch(function(error) {
+        console.error('Error adding product to cart', error);
+      });
+  }
+</script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/index.js"></script>
+</body>
+</html>

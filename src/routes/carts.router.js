@@ -1,43 +1,112 @@
 import { Router } from 'express';
-import { CartManager } from '../controllers/cartManager.js';
+import { MongoCartManager } from '../controllers/cartManager.js';
 
 const router = Router();
-const cartManagerAdapter = new CartManager('carts.json');
 
-// Endpoint POST /api/carts (Create new cart)
+const cartManagerInstance = new MongoCartManager();
+
+// Endpoint POST /api/carts (Create a new cart) 
 router.post('/', (req, res) => {
-  const newCart = cartManagerAdapter.createCart();
+  const newCart = cartManagerInstance.createCart();
   res.status(201).json(newCart);
 });
 
-// Endpoint GET /api/carts/:cid (It list all products from cart, if doesn´t exist then create a empty array)
+// Endpoint GET using mongoose's POPULATE (/api/carts/:cid)
 router.get('/:cid', async (req, res) => {
-  const cartId = parseInt(req.params.cid);
-  const cart = await cartManagerAdapter.getCartById(cartId);
-
-  if (!cart) {
-    return res.status(404).json({ error: 'Cart not found' });
+  const cartId = req.params.cid;
+  try {
+    const cart = await cartManagerInstance.getPopulatedCartById(cartId);
+    res.json(cart.products);
+  } catch (error) {
+    res.status(404).json({ error: 'Cart not found' });
   }
-
-  res.json(cart.products);
 });
 
-// Endpoint POST /api/carts/:cid/product/:pid (Add new product to cart)
+// Endpoint POST /api/carts/:cid/product/:pid (Add a product to the cart)
 router.post('/:cid/product/:pid', async (req, res) => {
-  const cartId = parseInt(req.params.cid);
-  const productId = parseInt(req.params.pid);
+  const cartId = req.params.cid;  
+  const productId = req.params.pid; 
   const { quantity } = req.body;
 
   if (!quantity || isNaN(quantity)) {
-    return res.status(400).json({ error: 'No valid' });
+    return res.status(400).json({ error: 'Invalid quantity' });
   }
 
-  const cart = cartManagerAdapter.addProductToCart(cartId, productId, quantity);
+  const cart = cartManagerInstance.addProductToCart(cartId, productId, quantity);
   if (!cart) {
     return res.status(404).json({ error: 'Cart not found' });
   }
 
   res.json(cart);
+});
+
+// Endpoint DELETE /api/carts/:cid/product/:pid (Remove a product by ID)
+router.delete('/:cid/product/:pid', async (req, res) => {
+  const cartId = req.params.cid;
+  const productId = req.params.pid;
+
+  try {
+    const cart = await cartManagerInstance.removeProductFromCart(cartId, productId);
+    if (!cart) {
+      return res.status(404).json({ error: 'Cart not found' });
+    }
+    res.json(cart);
+  } catch (error) {
+    res.status(500).json({ error: 'Error deleting product from cart' });
+  }
+});
+
+// Endpoint DELETE /api/carts/:cid (Remove ALL products from a cart)
+router.delete('/:cid', async (req, res) => {
+  const cartId = req.params.cid;
+
+  try {
+    const cart = await cartManagerInstance.clearCart(cartId);
+    if (!cart) {
+      return res.status(404).json({ error: 'Cart not found' });
+    }
+    res.json(cart);
+  } catch (error) {
+    res.status(500).json({ error: 'Error deleting all products from cart' });
+  }
+});
+
+// Endpoint PUT /api/carts/:cid (Update the entire cart with a new array of products)
+router.put('/:cid', async (req, res) => {
+  const cartId = req.params.cid;
+  const newProducts = req.body.products;
+
+  try {
+    console.log('Received new products:', newProducts);
+    
+    const cart = await cartManagerInstance.updateCart(cartId, newProducts);
+    if (!cart) {
+      return res.status(404).json({ error: 'Cart not found' });
+    }
+    
+    console.log('Updated cart:', cart);
+    res.json(cart);
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Error updating the cart' });
+  }
+});
+
+// Endpoint PUT /api/carts/:cid/product/:pid (Update the quantity of a specific product in the cart)
+router.put('/:cid/product/:pid', async (req, res) => {
+  const cartId = req.params.cid;
+  const productId = req.params.pid;
+  const newQuantity = req.body.quantity;
+
+  try {
+    const cart = await cartManagerInstance.updateProductQuantity(cartId, productId, newQuantity);
+    if (!cart) {
+      return res.status(404).json({ error: 'Cart not found' });
+    }
+    res.json(cart);
+  } catch (error) {
+    res.status(500).json({ error: 'Error updating product quantity in cart' });
+  }
 });
 
 export default router;

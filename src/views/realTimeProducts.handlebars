@@ -1,30 +1,31 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Time Products</title>
+    <title>Real Time Products</title>
 </head>
 <body>
     
-    <h1>Products in real time:</h1>
+    <h1>Real Time Products:</h1>
+    <a href="/"><button>Home</button></a>
     <ul id="productList">
       {{#each products}}
-    <li data-product-id="{{this.id}}">
-    Product Name: {{this.title}} - Price: $ {{this.price}} - description: {{this.description}} - ID number: {{this.id}}
-   </li>
-    {{/each}}
-</ul>
+        <li data-product-id="{{this.id}}">
+            Product Name: {{this.title}} - Price: $ {{this.price}} - Description: {{this.description}} - ID: {{this.id}}
+        </li>
+      {{/each}}
+    </ul>
 
     <div class="card">
 
      <h2>Add Product:</h2>
         <form id="addProductForm">
-        <label for="title">Títle:</label>
+        <label for="title">Title:</label>
         <input type="text" id="title" name="title" required>
 
         <label for="description">Description:</label>
         <input type="text" id="description" name="description" required>
 
-        <label for="price">Price$:</label>
+        <label for="price">Price:</label>
         <input type="number" id="price" name="price" required>
 
         <label for="code">Code:</label>
@@ -45,12 +46,13 @@
      <h2>Delete Product:</h2>
         <form id="deleteProductForm">
             <label for="productId">Product ID:</label>
-            <input type="number" id="productId" name="productId" required>
+            <input type="text" id="productId" name="productId" required>
             <button type="submit">Delete Product</button>
         </form>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script src="/js/index.js"></script>
+    
 </body>
 </html>
