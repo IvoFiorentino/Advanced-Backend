@@ -5,62 +5,87 @@ const productManagerInstance = new MongoProductManager();
 
 const router = Router();
 
-// Renders the corresponding API/VIEWS/ view for "Home" and passes the complete list of products.
+// It will render the corresponding API/VIEWS/ "Home" view and pass the complete product list.
 router.get('/', async (req, res) => {
     try {
         const products = await productManagerInstance.getProducts();
         res.render('home', { products });
     } catch (error) {
-        res.status(500).json({ error: 'Error fetching list of products' });
+        res.status(500).json({ error: 'Error while obtaining the list of products' });
     }
 });
 
-// Renders the new PRODUCTS route.
+// It will render the new PRODUCTS route (API/VIEWS/PRODUCTS).
 router.get('/products', async (req, res) => {
   try {
       const products = await productManagerInstance.getProducts();
-      res.render('products', { products });
+      res.render('products', { products, user: req.session.user });
   } catch (error) {
-      res.status(500).json({ error: 'Error fetching list of products' });
+      res.status(500).json({ error: 'Error while obtaining the list of products' });
   }
 });
 
-// Renders the view API/VIEWS/REALTIMEPRODUCTS and displays the list of products in real-time, adding or removing items based on actions submitted by forms.
+// It will render the API/VIEWS/REALTIMEPRODUCTS view and display the list of products in real-time, adding or removing items based on actions entered through forms.
 router.get('/realtimeproducts', async (req, res) => {
     try {
-        const products = await productManagerInstance.getProducts();
+        const products = await productManagerInstance.getProducts() ;
         res.render('realTimeProducts', { products }); 
     } catch (error) {
-        res.status(500).json({ error: 'Error fetching list of products' });
+        res.status(500).json({ error: 'Error while obtaining the list of products' });
     }
 });
 
-// Automatically re-renders the list, excluding the product deleted by ID.
+// It will automatically render the list again, removing the product by ID.
 router.delete('/delete/:id', async (req, res) => {
     const productId = req.params.id;
 
     try {
         const deletedProduct = await productManagerInstance.deleteProduct(productId);
         if (deletedProduct) {
-            socketServer.emit('deleteProduct', productId);
-            res.status(200).json({ message: `Product ID ${productId} deleted.` });
+          socketServer.emit('deleteProduct', productId);
+          res.status(200).json({ message: `Product ID ${productId} deleted.` });
         } else {
-            res.status(404).json({ error: `Product with ID ${productId} not found.` });
+          res.status(404).json({ error: `No product found with ID ${productId}.` });
         }
     } catch (error) {
-        res.status(500).json({ error: 'Error deleting product.' });
-    }
+    res.status(500).json({ error: 'Error while deleting the product.' });
+  }
 });
 
 // New route to view a specific cart with its products using populate.
 router.get('/carts/:cid', async (req, res) => {
-    const cartId = req.params.cid;
-    try {
-        const cart = await cartManagerInstance.getPopulatedCartById(cartId);
-        res.render('carts', { products: cart.products });
-    } catch (error) {
-        res.status(500).json({ error: 'Error fetching cart' });
-    }
+  const cartId = req.params.cid;
+  try {
+    const cart = await cartManagerInstance.getPopulatedCartById(cartId);
+    res.render('carts', { products: cart.products });
+  } catch (error) {
+    res.status(500).json({ error: 'Error while obtaining the cart' });
+  }
 });
+  
+// USERS ---
+const publicAccess = (req, res, next) => {
+  if (req.session.user) return res.redirect('/profile');
+  next();
+}
+
+const privateAccess = (req, res, next) => {
+  if (!req.session.user) return res.redirect('/login');
+  next();
+}
+
+router.get('/register', publicAccess, (req, res) => {
+  res.render('register')
+})
+
+router.get('/login', publicAccess, (req, res) => {
+  res.render('login')
+})
+
+router.get('/profile', privateAccess, (req, res) => {
+  res.render('profile',{
+      user: req.session.user
+  })
+})
 
 export default router;

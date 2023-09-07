@@ -5,7 +5,7 @@ const router = Router();
 
 const productManagerInstance = new MongoProductManager();
 
-// GET modified to meet search methods based on api/products requirements
+// Modified GET to comply with search methods as required by api/products
 router.get('/', async (req, res) => {
   try {
     const { limit = 10, page = 1, query, sort } = req.query;
@@ -44,14 +44,14 @@ router.get('/', async (req, res) => {
 
     res.json(response);
   } catch (error) {
-    res.status(500).json({ error: 'Error retrieving product list' });
+    res.status(500).json({ error: 'Error while obtaining the list of products' });
   }
 });
 
-// Endpoint GET /api/products/:pid (Retrieve a product by unique ID)
+// Endpoint GET /api/products/:pid (Retrieves a product by unique ID)
 router.get('/:pid', async (req, res) => {
   try {
-    const productId = req.params.pid; // Removed parseInt for Mongoose ID
+    const productId = req.params.pid; // Removed parseInt to work with Mongoose IDs
     const product = await productManagerInstance.getProductById(productId);
 
     if (!product) {
@@ -60,11 +60,11 @@ router.get('/:pid', async (req, res) => {
 
     res.json(product);
   } catch (error) {
-    res.status(500).json({ error: 'Error retrieving requested product' });
+    res.status(500).json({ error: 'Error while obtaining the requested product' });
   }
 });
 
-// Endpoint POST /api/products (Add a new product)
+// Endpoint POST /api/products (Allows adding a new product)
 router.post('/', (req, res) => {
   const { title, description, code, price, stock, category, thumbnails } = req.body;
   const product = {
@@ -86,7 +86,7 @@ router.post('/', (req, res) => {
   }
 });
 
-// Endpoint PUT /api/products/:pid (Update a product)
+// Endpoint PUT /api/products/:pid (Updates a product)
 router.put('/:pid', async (req, res) => {
   const productId = req.params.pid; // Removed parseInt to work with Mongoose IDs
   const updatedFields = req.body; 
@@ -94,7 +94,7 @@ router.put('/:pid', async (req, res) => {
   res.json({ message: 'Product updated successfully' });
 });
 
-// Endpoint DELETE /api/products/:pid (Delete a product Deliverable 3)
+// Endpoint DELETE /api/products/:pid (Deletes a product as per Deliverable 3)
 router.delete('/:pid', async (req, res) => {
   const productId = req.params.pid; // Removed parseInt to work with Mongoose ID
   await productManagerInstance.deleteProduct(productId);

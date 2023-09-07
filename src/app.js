@@ -8,8 +8,30 @@ import viewsRouter from './routes/views.router.js'; // Import viewsRouter
 import { Server } from 'socket.io'; // Import socket
 import '../src/db/dbConfig.js';
 import { Message } from '../src/db/models/messages.models.js';
+import sessionRouter from '../src/routes/sessions.router.js'; // Import sessions router
+import cookieParser from 'cookie-parser'; // Import cookie parser
 
-// EXPRESS Configurations
+import session from 'express-session'; // Import express-session for session management
+import FileStore from 'session-file-store'; // Import session-file-store for session storage in files
+import MongoStore from 'connect-mongo'; // Import connect-mongo for MongoDB session storage
+
+// SESSION CONFIGURATIONS - CONNECT SESSION WITH OUR FILESTORE
+const fileStorage = FileStore(session);
+
+// CONFIGURE COOKIE PARSER + SESSIONS
+app.use(cookieParser());
+app.use(session({
+  store: MongoStore.create({
+    // mongoUrl: "mongodb+srv://ldebiaggi:Argentina09@cluster0.vlb2rbw.mongodb.net/EcommerceLD?retryWrites=true&w=majority",
+    mongoOptions: { useNewUrlParser: true, useUnifiedTopology: true },
+    ttl: 15,
+  }),
+  secret: "asdf1234",
+  resave: false,
+  saveUninitialized: false
+}));
+
+// EXPRESS CONFIGURATION
 const app = express();
 
 app.use(express.json());
@@ -45,6 +67,25 @@ app.get('/chat', (req, res) => {
   res.render('chat', { messages: [] });
 });
 
+// Route to the API/sessions
+app.use("/api/session", sessionRouter);
+
+// Routes for login, register, and profile
+app.get('/login', (req, res) => {
+  res.render('login'); 
+});
+
+app.get('/register', (req, res) => {
+  res.render('register'); 
+});
+
+app.get('/profile', (req, res) => {
+  res.render('profile', {
+    user: req.session.user,
+  }); 
+});
+
+
 // Declare a variable for the port and listen on that port
 const PORT = 8080;
 
@@ -62,14 +103,14 @@ socketServer.on('connection', (socket) => {
   });
 
   socket.on('addProduct', (newProduct) => {
-    // const addedProduct = productManagerInstance.addProduct(newProduct);
-    // socketServer.emit('addProduct', addedProduct);
+    const addedProduct = productManagerInstance.addProduct(newProduct);
+    socketServer.emit('addProduct', addedProduct);
   });
 
   socket.on('deleteProduct', (productId) => {
-    // productManagerInstance.deleteProduct(Number(productId));
-    // socketServer.emit('productDeleted', productId);
-    // socketServer.emit('updateProductList');
+    productManagerInstance.deleteProduct(Number(productId));
+    socketServer.emit('productDeleted', productId);
+    socketServer.emit('updateProductList');
   });
 
   socket.on('chatMessage', async (messageData) => {
