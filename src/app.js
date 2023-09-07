@@ -22,7 +22,7 @@ const fileStorage = FileStore(session);
 app.use(cookieParser());
 app.use(session({
   store: MongoStore.create({
-    // mongoUrl: "mongodb+srv://ldebiaggi:Argentina09@cluster0.vlb2rbw.mongodb.net/EcommerceLD?retryWrites=true&w=majority",
+    // mongoUrl: FALTA AGREGAR DIRECCION
     mongoOptions: { useNewUrlParser: true, useUnifiedTopology: true },
     ttl: 15,
   }),
