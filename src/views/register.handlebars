@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sign Up</title>
+</head>
+<body>
+<div>
+        <h1>Registration</h1>
+        <form id="registerForm">
+            <label>First Name:</label>
+            <input name="first_name">
+            <label>Last Name:</label>
+            <input name="last_name">
+            <label>Email:</label>
+            <input name="email">
+            <label>Age:</label>
+            <input name="age">
+            <label>Password:</label>
+            <input type="password" name="password">
+
+            <input type="submit">
+
+        </form>
+        <p>Already have an account? <a href="/login">Log in here</a></p>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/register.js"></script>
+</body>
+</html>

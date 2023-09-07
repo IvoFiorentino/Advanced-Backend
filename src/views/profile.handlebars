@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Your Profile</title>
+    <script>
+        setTimeout(function () {
+            window.location.href = '/api/views/products'; // Redirecting to the product view in 5 seconds
+        }, 5000); 
+    </script>
+</head>
+<body>
+<div>
+    <h1>Welcome to your profile!</h1>
+    <p>Hello: {{user.name}}</p>
+    <p>{{user.email}}</p>
+    <p>{{user.age}}</p>
+    <p>In a few seconds, you will see the list of products!</p>
+
+    <a href="/api/session/logout"><button>Log out</button></a>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/index.js"></script>
+</body>
+</html>

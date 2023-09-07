@@ -5,16 +5,24 @@
 </head>
 <body>
   <h1>List of Products</h1>
-   <a href="/"><button>Home</button></a>
-  <ul>
+  <a href="/"><button>Home</button></a>
+ 
+    <div>
+        <h2>WELCOME</h2>
+        <p>Hello! {{user.name}}</p>
+        <p>Email: {{user.email}}</p>
+        <p>Age: {{user.age}}</p>
+        <p>Role: {{user.role}}</p>
+    </div>
+
 <ul>
-  {{#each products}}
+  {{#each products.docs}}
     <li>
-      <h2>Product Name: {{this.title}}</h2>
-      <p>Price: {{this.price}}</p>
-      <p>Category: {{this.category}}</p>
-      <button class="view-details-button" data-product-id={{this._id}}>View Details</button>
-      <button class="add-to-cart-button" data-product-id={{this._id}}>Add to Cart</button>
+      <h2>Product Name: {{title}}</h2>
+      <p>Price: {{price}}</p>
+      <p>Category: {{category}}</p>
+      <button class="view-details-button" data-product-id={{_id}}>View Details</button>
+      <button class="add-to-cart-button" data-product-id={{_id}}>Add to Cart</button>
     </li>
   {{/each}}
 </ul>
@@ -41,7 +49,7 @@
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ quantity: 1 }), // Temporary until we have a view with a field to enter quantity, adding one at a time for now
+      body: JSON.stringify({ quantity: 1 }), // Temporary until we have a view with the field to enter the quantity; we add one at a time
     })
       .then(function(response) {
         return response.json();
@@ -55,7 +63,9 @@
       });
   }
 </script>
+<a href="/api/session/logout"><button>Logout</button></a>
+
     <script src="/socket.io/socket.io.js"></script>
-    <script src="/js/index.js"></script>
+    <script src="/js/products.js"></script>
 </body>
 </html>
