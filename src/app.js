@@ -18,11 +18,18 @@ import MongoStore from 'connect-mongo'; // Import connect-mongo for MongoDB sess
 // SESSION CONFIGURATIONS - CONNECT SESSION WITH OUR FILESTORE
 const fileStorage = FileStore(session);
 
+//APP CREATE
+const app = express();
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static(__dirname + '/public'));
+
 // CONFIGURE COOKIE PARSER + SESSIONS
 app.use(cookieParser());
 app.use(session({
   store: MongoStore.create({
-    // mongoUrl: FALTA AGREGAR DIRECCION
+    ///// mongoUrl: DATABASE REMAINS //////
     mongoOptions: { useNewUrlParser: true, useUnifiedTopology: true },
     ttl: 15,
   }),
@@ -30,13 +37,6 @@ app.use(session({
   resave: false,
   saveUninitialized: false
 }));
-
-// EXPRESS CONFIGURATION
-const app = express();
-
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(express.static(__dirname + '/public'));
 
 // HANDLEBARS Configurations
 app.engine('handlebars', handlebars.engine());
@@ -63,9 +63,9 @@ app.use('/api/views/products', productsRouter);
 app.use('/api/carts', cartsRouter);
 
 // Chat route
-app.get('/chat', (req, res) => {
-  res.render('chat', { messages: [] });
-});
+// app.get('/chat', (req, res) => {
+//   res.render('chat', { messages: [] });
+// });
 
 // Route to the API/sessions
 app.use("/api/session", sessionRouter);

@@ -1,7 +1,7 @@
 import mongoose from 'mongoose'
 
 //CONFIG MONGOOSE
-// const URI = FALTA AGREGAR DIRECCION
+///// const URI = DATABASE REMAINS //////
 mongoose.connect(URI)
 .then(()=> console.log('connected to database'))
 .catch((error) => {
