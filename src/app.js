@@ -29,11 +29,11 @@ app.use(express.static(__dirname + '/public'));
 app.use(cookieParser());
 app.use(session({
   store: MongoStore.create({
-    ///// mongoUrl: DATABASE REMAINS //////
+    mongoUrl: 'mongodb+srv://ivofiorentino0:uX0hI0GHRkmCsBFK@cluster0.cnfy4dr.mongodb.net/?retryWrites=true&w=majority',
     mongoOptions: { useNewUrlParser: true, useUnifiedTopology: true },
     ttl: 15,
   }),
-  secret: "asdf1234",
+  secret: "uX0hI0GHRkmCsBFK",
   resave: false,
   saveUninitialized: false
 }));
