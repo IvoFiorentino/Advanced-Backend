@@ -29,7 +29,7 @@ app.use(express.static(__dirname + '/public'));
 app.use(cookieParser());
 app.use(session({
   store: MongoStore.create({
-    mongoUrl: 'mongodb+srv://ivofiorentino0:uX0hI0GHRkmCsBFK@cluster0.cnfy4dr.mongodb.net/?retryWrites=true&w=majority',
+    // mongoUrl: ADD DATABASE URI
     mongoOptions: { useNewUrlParser: true, useUnifiedTopology: true },
     ttl: 15,
   }),
