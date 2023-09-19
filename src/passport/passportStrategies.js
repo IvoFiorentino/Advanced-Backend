@@ -1,7 +1,7 @@
 import passport from "passport"
 import  userModel from '../db/models/user.model.js'
 import { Strategy as LocalStrategy } from 'passport-local'
-// import { Strategy as GithubStrategy } from 'passport-github2'
+import { Strategy as GithubStrategy } from 'passport-github2'
 import { compareData } from "../utils.js"
 import { usersManager } from "../controllers/usersManager.js"
 
@@ -39,31 +39,31 @@ passport.use('login', new LocalStrategy(
     }
 ))
 
-// Github Strategy       //WORKING PROGRESS//
-// passport.use('github', new GithubStrategy({
-//     clientID: 
-//     clientSecret: 
-//     callbackURL: 'http://localhost:8080/api/session/githubcallback',
-// },
-// async function(accessToken, refreshToken, profile, done){
-//     try {
-//         // Check if the GitHub user exists, and if so, log in.
-//         const userExists = await usersManager.findUser(profile.username);
-//         if (userExists) {
-//             return done(null, userExists);
-//         }
-//         // If the user doesn't exist, create it.
-//         const newUser = {
-//             first_name: profile.displayName,
-//             last_name: profile.displayName,
-//             username: profile.username,
-//             password: ' ',
-//             fromGithub: true, // Indicates that this user comes from GitHub
-//         }
-//         const result = await usersManager.create(newUser)
-//         return done (null, result)
-//     } catch (error) {
-//         done(error)
-//     }
-// }
-// ))
+//Github Strategy    
+passport.use('github', new GithubStrategy({
+    clientID: '98b7f9797c99115a817e',
+    clientSecret: 'db55a0604f27fcfe9ac693861e52f3c8674308e4',
+    callbackURL: 'http://localhost:8080/api/session/githubcallback',
+},
+async function(accessToken, refreshToken, profile, done){
+    try {
+        // Check if the GitHub user exists, and if so, log in.
+        const userExists = await usersManager.findUser(profile.username);
+        if (userExists) {
+            return done(null, userExists);
+        }
+        // If the user doesn't exist, create it.
+        const newUser = {
+            first_name: profile.displayName,
+            last_name: profile.displayName,
+            username: profile.username,
+            password: ' ',
+            fromGithub: true, // Indicates that this user comes from GitHub
+        }
+        const result = await usersManager.create(newUser)
+        return done (null, result)
+    } catch (error) {
+        done(error)
+    }
+}
+))

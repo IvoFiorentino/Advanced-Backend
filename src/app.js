@@ -3,17 +3,19 @@ import { MongoProductManager } from '../src/controllers/productManager.js';
 import productsRouter from '../src/routes/products.router.js'; // Import the products router
 import cartsRouter from '../src/routes/carts.router.js'; // Import the carts router
 import { __dirname } from './utils.js'; // Import Utils
-import handlebars from 'express-handlebars'; // Import Handlebars
+import handlebars from 'express-handlebars'; // Import handlebars
 import viewsRouter from './routes/views.router.js'; // Import viewsRouter
 import { Server } from 'socket.io'; // Import socket
 import '../src/db/dbConfig.js';
 import { Message } from '../src/db/models/messages.models.js';
 import sessionRouter from '../src/routes/sessions.router.js'; // Import sessions router
-import cookieParser from 'cookie-parser'; // Import cookie parser
+import cookieParser from 'cookie-parser'; // Import cookie parse
+import passport from 'passport'; // Import Passport
+import './passport/passportStrategies.js';
 
-import session from 'express-session'; // Import express-session for session management
-import FileStore from 'session-file-store'; // Import session-file-store for session storage in files
-import MongoStore from 'connect-mongo'; // Import connect-mongo for MongoDB session storage
+import session from 'express-session';
+import FileStore from 'session-file-store'; // Import FileStore
+import MongoStore from 'connect-mongo'; // Import MongoStore
 
 // SESSION CONFIGURATIONS - CONNECT SESSION WITH OUR FILESTORE
 const fileStorage = FileStore(session);
@@ -29,28 +31,32 @@ app.use(express.static(__dirname + '/public'));
 app.use(cookieParser());
 app.use(session({
   store: MongoStore.create({
-    // mongoUrl: ADD DATABASE URI
+    mongoUrl: 'mongodb+srv://ivofiorentino0:vAUaOtrcWBzUJ5EG@ecommerceivof.jl3fssh.mongodb.net/EcommerceivoF?retryWrites=true&w=majority',
     mongoOptions: { useNewUrlParser: true, useUnifiedTopology: true },
     ttl: 15,
   }),
-  secret: "uX0hI0GHRkmCsBFK",
+  secret: "vAUaOtrcWBzUJ5EG",
   resave: false,
   saveUninitialized: false
 }));
 
-// HANDLEBARS Configurations
+// PASSPORT CONFIGURATIONS
+app.use(passport.initialize());
+app.use(passport.session());
+
+// HANDLEBARS CONFIGURATIONS
 app.engine('handlebars', handlebars.engine());
 app.set('views', __dirname + '/views');
 app.set('view engine', 'handlebars');
 
-// Routes for viewsRouter
+// Routes viewRouter
 app.use('/api/views', viewsRouter);
 app.use('/api/views/delete/:id', viewsRouter);
 
-// IMPORTANT! Uncomment the following line if you want to work with persistence through FS.
+// IMPORTANT! Comment out the following line if you want to work with persistence through FS.
 const productManagerInstance = new MongoProductManager();
 
-// Welcome message when accessing the root of the app
+// Welcome message when accessing the app root
 app.get('/', (req, res) => {
   res.send('Welcome to my application!');
 });
@@ -63,30 +69,29 @@ app.use('/api/views/products', productsRouter);
 app.use('/api/carts', cartsRouter);
 
 // Chat route
-// app.get('/chat', (req, res) => {
-//   res.render('chat', { messages: [] });
-// });
+app.get('/chat', (req, res) => {
+  res.render('chat', { messages: [] });
+});
 
-// Route to the API/sessions
-app.use("/api/session", sessionRouter);
+// Route to api/sessions
+app.use('/api/session', sessionRouter);
 
 // Routes for login, register, and profile
 app.get('/login', (req, res) => {
-  res.render('login'); 
+  res.render('login');
 });
 
 app.get('/register', (req, res) => {
-  res.render('register'); 
+  res.render('register');
 });
 
 app.get('/profile', (req, res) => {
   res.render('profile', {
     user: req.session.user,
-  }); 
+  });
 });
 
-
-// Declare a variable for the port and listen on that port
+// Declaration of variable for port + port listening
 const PORT = 8080;
 
 const httpServer = app.listen(PORT, () => {
@@ -121,6 +126,6 @@ socketServer.on('connection', (socket) => {
     // Emit the message to all connected clients
     socketServer.emit('chatMessage', { user, message });
 
-    console.log(`Message saved to database: ${user}: ${message}`);
+    console.log(`Message saved in the database: ${user}: ${message}`);
   });
 });
