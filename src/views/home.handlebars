@@ -1,17 +1,25 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Home</title>
+    <link rel="stylesheet" href="{{__dirname}}/style.css">
+    <title>User Login</title> 
 </head>
-<body>
-    <h1>List of Products:</h1>
-    <a href="/"><button>Home</button></a>
-    <ul>
-        {{#each products}}
-        <li>{{this}}</li>  
-        {{/each}}
-    </ul>
+<body> 
+<div>
+<div>
+    <h1>Log into your account!</h1>
+    <form id="loginForm">
+        <label>Email</label>
+        <input name="email">
+        <br>
+        <label>Password</label>
+        <input name="password" type="password">
+        <input type="submit">
+    </form>
+    <a href="/api/session/github"><button>Login with Github</button></a>
+    <p>Not registered yet? <a href="/register">Register here</a></p>
+    </div>
     <script src="/socket.io/socket.io.js"></script>
-    <script src="/js/index.js"></script>
+    <script src="/js/login.js"></script>
 </body>
 </html>

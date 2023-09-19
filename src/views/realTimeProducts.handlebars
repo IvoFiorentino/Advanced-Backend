@@ -1,19 +1,19 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Real Time Products</title>
+    <title>Real-Time Products</title>
 </head>
 <body>
     
-    <h1>Real Time Products:</h1>
+    <h1>Real-Time Products:</h1>
     <a href="/"><button>Home</button></a>
     <ul id="productList">
-      {{#each products}}
-        <li data-product-id="{{this.id}}">
-            Product Name: {{this.title}} - Price: $ {{this.price}} - Description: {{this.description}} - ID: {{this.id}}
-        </li>
-      {{/each}}
-    </ul>
+      {{#each products.docs}}
+    <li data-product-id="{{_id}}">
+    Product Name: {{title}} - Price: ${{price}} - Description: {{description}} - ID Number: {{_id}}
+   </li>
+    {{/each}}
+</ul>
 
     <div class="card">
 
@@ -46,7 +46,7 @@
      <h2>Delete Product:</h2>
         <form id="deleteProductForm">
             <label for="productId">Product ID:</label>
-            <input type="text" id="productId" name="productId" required>
+            <input type="" id="productId" name="productId" required>
             <button type="submit">Delete Product</button>
         </form>
     </div>

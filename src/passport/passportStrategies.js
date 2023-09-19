@@ -41,8 +41,8 @@ passport.use('login', new LocalStrategy(
 
 //Github Strategy    
 passport.use('github', new GithubStrategy({
-    clientID: '98b7f9797c99115a817e',
-    clientSecret: 'db55a0604f27fcfe9ac693861e52f3c8674308e4',
+    //clientID: //INSERT ID CLIENT
+    //clientSecret: INSERT SECRET CLIENT
     callbackURL: 'http://localhost:8080/api/session/githubcallback',
 },
 async function(accessToken, refreshToken, profile, done){

@@ -5,7 +5,7 @@ class MongoCartManager {
     this.loadCarts();
   }
 
-  // Load the carts
+  // Load carts
   async loadCarts() {
     try {
       this.carts = await Cart.find();
@@ -21,7 +21,7 @@ class MongoCartManager {
       console.log('Cart saved');
       return cart;
     } catch (error) {
-      throw new Error('Error saving the cart: ' + error.message);
+      throw new Error('Error saving cart: ' + error.message);
     }
   }
 
@@ -35,12 +35,12 @@ class MongoCartManager {
       console.log(`Cart created, its ID is: ${savedCart._id}`);
       return savedCart;
     } catch (error) {
-      console.log('Error saving the cart', error.message);
+      console.log('Error saving cart', error.message);
       throw error;
     }
   }
 
-  // Get carts by searching for their Mongo IDs
+  // Get carts by searching for their Mongo ID
   async getCartById(id) {
     try {
       const cart = await Cart.findById(id);
@@ -50,16 +50,16 @@ class MongoCartManager {
         throw new Error('Cart not found');
       }
     } catch (error) {
-      throw new Error('Error getting the cart: ' + error.message);
+      throw new Error('Error getting cart: ' + error.message);
     }
   }
 
-  // Add products to the cart, using the ID of each product (cart ID + product ID)
+  // Add products to the cart, based on their individual IDs (cart ID + product ID)
   async addProductToCart(cartId, productId, quantity) {
     const cart = await this.getCartById(cartId);
     const existingProduct = cart.products.find((p) => p.product.equals(productId));
 
-    // If no quantity is provided, products will be added one by one
+    // If no quantity is provided, add products one by one.
     if (existingProduct) {
       existingProduct.quantity += quantity || 1;
     } else {
@@ -70,13 +70,13 @@ class MongoCartManager {
       await this.saveCart(cart);
       console.log(`Product added to cart ${cartId}`);
     } catch (error) {
-      throw new Error('Error saving the cart: ' + error.message);
+      throw new Error('Error saving cart: ' + error.message);
     }
 
     return cart;
   }
 
-  // Remove a product by ID
+  // Remove product by ID
   async removeProductFromCart(cartId, productId) {
     const cart = await this.getCartById(cartId);
     cart.products = cart.products.filter((p) => !p.product.equals(productId));
@@ -85,7 +85,7 @@ class MongoCartManager {
       await this.saveCart(cart);
       console.log(`Product removed from cart ${cartId}`);
     } catch (error) {
-      throw new Error('Error saving the cart: ' + error.message);
+      throw new Error('Error saving cart: ' + error.message);
     }
 
     return cart;
@@ -98,11 +98,11 @@ class MongoCartManager {
       const cart = await this.getCartById(cartId);
 
       if (!cart) {
-        throw new Error("Cart not found");
+        throw new Error('Cart not found');
       }
 
       if (!Array.isArray(newProducts)) {
-        throw new Error("Invalid products data");
+        throw new Error('Invalid products data');
       }
 
       newProducts.forEach((newProduct) => {
@@ -118,12 +118,11 @@ class MongoCartManager {
       });
 
       await this.saveCart(cart);
-      console.log(`Cart ${cartId} was updated with new products`);
+      console.log(`Cart ${cartId} has been updated with new products`);
       return cart;
-
     } catch (error) {
-      console.error("Error updating the cart:", error);
-      throw new Error("Error updating the cart: " + error.message);
+      console.error('Error updating cart:', error);
+      throw new Error('Error updating cart: ' + error.message);
     }
   }
 
@@ -138,10 +137,10 @@ class MongoCartManager {
         cart.products.push({ product: productId, quantity: newQuantity });
       }
       await this.saveCart(cart);
-      console.log("Product added to the cart");
+      console.log('Product added to the cart');
       return cart;
     } catch (error) {
-      throw new Error("Error saving the cart" + error.message);
+      throw new Error('Error saving cart: ' + error.message);
     }
   }
 
@@ -152,15 +151,15 @@ class MongoCartManager {
 
     try {
       await this.saveCart(cart);
-      console.log(`Cart emptied ${cartId}`);
+      console.log(`Cart ${cartId} emptied`);
     } catch (error) {
-      throw new Error('Error saving the cart: ' + error.message);
+      throw new Error('Error saving cart: ' + error.message);
     }
 
     return cart;
   }
 
-  // Use populate when searching for a cart by ID to list its products
+  // Use populate to search for a cart by ID and list its products
   async getPopulatedCartById(_id) {
     try {
       const cart = await Cart.findById(_id).populate('products.product');
@@ -170,7 +169,7 @@ class MongoCartManager {
         throw new Error('Cart not found');
       }
     } catch (error) {
-      throw new Error('Error getting the cart: ' + error.message);
+      throw new Error('Error getting cart: ' + error.message);
     }
   }
 }

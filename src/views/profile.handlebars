@@ -2,24 +2,24 @@
 <html>
 <head>
     <title>Your Profile</title>
-    <script>
+        <script>
         setTimeout(function () {
-            window.location.href = '/api/views/products'; // Redirecting to the product view in 5 seconds
+            window.location.href = '/api/views/products'; // Redirecting to the products view after 5 seconds
         }, 5000); 
     </script>
 </head>
 <body>
 <div>
-    <h1>Welcome to your profile!</h1>
-    <p>Hello: {{user.name}}</p>
+    <h1>Welcome to Your Profile!</h1>
+    <p>Hello: {{user.name}} {{user.username}}</p>
     <p>{{user.email}}</p>
     <p>{{user.age}}</p>
-    <p>In a few seconds, you will see the list of products!</p>
+    <p>You will see the list of products in a few seconds!</p>
 
-    <a href="/api/session/logout"><button>Log out</button></a>
-</div>
+    <a href="/api/session/logout"><button>Log Out</button></a>
+    </div>
 
-<script src="/socket.io/socket.io.js"></script>
-<script src="/js/index.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/index.js"></script>
 </body>
 </html>

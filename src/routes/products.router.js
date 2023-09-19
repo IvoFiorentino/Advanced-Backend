@@ -72,7 +72,7 @@ router.post('/', (req, res) => {
     description,
     code,
     price,
-    status: true, // Following the requirement, set status to TRUE by default
+    status: true, 
     stock: stock,
     category,
     thumbnails: thumbnails ? thumbnails.split(',') : [], 
@@ -88,15 +88,15 @@ router.post('/', (req, res) => {
 
 // Endpoint PUT /api/products/:pid (Updates a product)
 router.put('/:pid', async (req, res) => {
-  const productId = req.params.pid; // Removed parseInt to work with Mongoose IDs
+  const productId = req.params.pid; 
   const updatedFields = req.body; 
   await productManagerInstance.updateProduct(productId, updatedFields);
   res.json({ message: 'Product updated successfully' });
 });
 
-// Endpoint DELETE /api/products/:pid (Deletes a product as per Deliverable 3)
+// Endpoint DELETE /api/products/:pid 
 router.delete('/:pid', async (req, res) => {
-  const productId = req.params.pid; // Removed parseInt to work with Mongoose ID
+  const productId = req.params.pid; 
   await productManagerInstance.deleteProduct(productId);
   res.json({ message: 'Product deleted successfully' });
 });

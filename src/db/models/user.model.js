@@ -12,11 +12,11 @@ const schema = new mongoose.Schema({
   username: String,
   role: {
     type: String,
-    default: 'user', // Default value for common users
+    default: 'user', 
   },
   fromGithub: {
     type: Boolean,
-    default: false, // Default value, the user is not registered from GitHub
+    default: false, 
   },
 });
 

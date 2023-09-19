@@ -9,7 +9,7 @@
  
     <div>
         <h2>WELCOME</h2>
-        <p>Hello! {{user.name}}</p>
+        <p>Hello! {{user.name}} {{user.username}}</p>
         <p>Email: {{user.email}}</p>
         <p>Age: {{user.age}}</p>
         <p>Role: {{user.role}}</p>
@@ -49,21 +49,21 @@
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ quantity: 1 }), // Temporary until we have a view with the field to enter the quantity; we add one at a time
+      body: JSON.stringify({ quantity: 1 }), 
     })
       .then(function(response) {
         return response.json();
       })
       .then(function(cart) {
 
-        console.log('Product added to cart', cart);
+        console.log('Product added to the cart', cart);
       })
       .catch(function(error) {
-        console.error('Error adding product to cart', error);
+        console.error('Error adding product to the cart', error);
       });
   }
 </script>
-<a href="/api/session/logout"><button>Logout</button></a>
+<a href="/api/session/logout"><button>Log Out</button></a>
 
     <script src="/socket.io/socket.io.js"></script>
     <script src="/js/products.js"></script>

@@ -5,7 +5,7 @@ const productManagerInstance = new MongoProductManager();
 
 const router = Router();
 
-// It will render the corresponding API/VIEWS/ "Home" view and pass the complete product list.
+//API/VIEWS/ 
 router.get('/', async (req, res) => {
     try {
         const products = await productManagerInstance.getProducts();
@@ -15,7 +15,7 @@ router.get('/', async (req, res) => {
     }
 });
 
-// It will render the new PRODUCTS route (API/VIEWS/PRODUCTS).
+//(API/VIEWS/PRODUCTS).
 router.get('/products', async (req, res) => {
   try {
       const products = await productManagerInstance.getProducts();
@@ -25,7 +25,7 @@ router.get('/products', async (req, res) => {
   }
 });
 
-// It will render the API/VIEWS/REALTIMEPRODUCTS view and display the list of products in real-time, adding or removing items based on actions entered through forms.
+
 router.get('/realtimeproducts', async (req, res) => {
     try {
         const products = await productManagerInstance.getProducts() ;
@@ -35,7 +35,7 @@ router.get('/realtimeproducts', async (req, res) => {
     }
 });
 
-// It will automatically render the list again, removing the product by ID.
+
 router.delete('/delete/:id', async (req, res) => {
     const productId = req.params.id;
 
@@ -52,7 +52,7 @@ router.delete('/delete/:id', async (req, res) => {
   }
 });
 
-// New route to view a specific cart with its products using populate.
+
 router.get('/carts/:cid', async (req, res) => {
   const cartId = req.params.cid;
   try {
@@ -63,7 +63,7 @@ router.get('/carts/:cid', async (req, res) => {
   }
 });
   
-// USERS ---
+// USERS 
 const publicAccess = (req, res, next) => {
   if (req.session.user) return res.redirect('/profile');
   next();

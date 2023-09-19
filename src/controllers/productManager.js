@@ -17,12 +17,13 @@ class MongoProductManager {
     return await Product.countDocuments(queryOptions);
   }
 
-  // Modify getProducts to list all products applying a limit of 10 per page
+  // Modify getProducts to list all products with a limit of 10 per page
   async getProducts(queryOptions = {}, sortOptions = {}, limit = 10, page = 1) {
     const options = {
       sort: sortOptions,
       page: page,
       limit: limit,
+      lean: true,
     };
 
     const result = await Product.paginate(queryOptions, options);
