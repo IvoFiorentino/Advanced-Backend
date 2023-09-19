@@ -35,7 +35,7 @@ router.post('/login', async (req, res) => {
     // Verify the password entered by the user against the hashed password in the database
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
-    // If the password doesn't match, check if it's the unhashed password (to allow login for users from the previous challenge, where we didn't use hashing)
+    // If the password doesn't match, check if it's the unhashed password 
     if (!isPasswordValid && password === user.password) {
 
     } else if (!isPasswordValid) {
@@ -51,7 +51,7 @@ router.post('/login', async (req, res) => {
         name: `${user.first_name} ${user.last_name}`,
         email: user.email,
         age: user.age,
-        role: user.role, // Add the user's role to the session
+        role: user.role, 
     }
 
     //res.send({status:"success", payload:req.res.user, message:"Welcome"})

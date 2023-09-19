@@ -14,17 +14,17 @@ router.get('/', async (req, res) => {
     if (query) {
       queryOptions = {
         $or: [
-          { title: { $regex: query, $options: 'i' } }, // Search by title (case-insensitive)
-          { category: { $regex: query, $options: 'i' } }, // Search by category (case-insensitive)
+          { title: { $regex: query, $options: 'i' } }, 
+          { category: { $regex: query, $options: 'i' } }, 
         ],
       };
     }
 
     const sortOptions = {};
     if (sort === 'asc') {
-      sortOptions.price = 1; // Ascending order by price
+      sortOptions.price = 1; 
     } else if (sort === 'desc') {
-      sortOptions.price = -1; // Descending order by price
+      sortOptions.price = -1; 
     }
 
     const productsPaginated = await productManagerInstance.getProducts(queryOptions, sortOptions, limit, page);
@@ -51,7 +51,7 @@ router.get('/', async (req, res) => {
 // Endpoint GET /api/products/:pid (Retrieves a product by unique ID)
 router.get('/:pid', async (req, res) => {
   try {
-    const productId = req.params.pid; // Removed parseInt to work with Mongoose IDs
+    const productId = req.params.pid; 
     const product = await productManagerInstance.getProductById(productId);
 
     if (!product) {
