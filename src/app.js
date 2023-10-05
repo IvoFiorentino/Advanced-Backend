@@ -1,5 +1,5 @@
 import express from 'express';
-import { MongoProductManager } from '../src/controllers/productManager.js';
+import { MongoProductManager } from '../src/DAL/productManager.js';
 import productsRouter from '../src/routes/products.router.js'; 
 import cartsRouter from '../src/routes/carts.router.js';
 import { __dirname } from './utils.js'; 
@@ -12,6 +12,8 @@ import sessionRouter from '../src/routes/sessions.router.js';
 import cookieParser from 'cookie-parser'; 
 import passport from 'passport'; 
 import './passport/passportStrategies.js';
+
+import config from './config.js';
 
 import session from 'express-session';
 import FileStore from 'session-file-store'; 
@@ -31,11 +33,11 @@ app.use(express.static(__dirname + '/public'));
 app.use(cookieParser());
 app.use(session({
   store: MongoStore.create({
-    mongoUrl: ,//INSERTAR URI
+    mongoUrl: 'mongodb+srv://ivofiorentino0:vAUaOtrcWBzUJ5EG@ecommerceivof.jl3fssh.mongodb.net/EcommerceivoF?retryWrites=true&w=majority',
     mongoOptions: { useNewUrlParser: true, useUnifiedTopology: true },
-    ttl: 15,
+    ttl: 2000,
   }),
-  secret: " ",
+  secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false
 }));
@@ -84,11 +86,9 @@ app.get('/profile', (req, res) => {
   });
 });
 
-//PORT
-const PORT = 8080;
 
-const httpServer = app.listen(PORT, () => {
-  console.log(`Listening on port ${PORT}`);
+const httpServer = app.listen(process.env.PORT, () => {
+  console.log(`Listening on port ${process.env.PORT}`);
 });
 
 // Socket and events

@@ -1,3 +1,6 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 import { Router } from 'express';
 import userModel from '../db/models/user.model.js';
 import passport from 'passport';
@@ -32,18 +35,15 @@ router.post('/login', async (req, res) => {
         return res.status(400).send({ status: "error", error: "Incorrect data" })
     }
 
-    // Verify the password entered by the user against the hashed password in the database
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
-    // If the password doesn't match, check if it's the unhashed password 
     if (!isPasswordValid && password === user.password) {
 
     } else if (!isPasswordValid) {
         return res.status(400).send({ status: "error", error: "Incorrect data" });
     }
 
-    // Validation for the ADMIN user as indicated in the deliverables slides
-    if (email === 'adminCoder@coder.com' && password === 'adminCod3r123') {
+    if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
         user.role = 'ADMIN';
     }
 
@@ -54,7 +54,6 @@ router.post('/login', async (req, res) => {
         role: user.role, 
     }
 
-    //res.send({status:"success", payload:req.res.user, message:"Welcome"})
     res.redirect('/api/views/products');
 })
 

@@ -1,17 +1,15 @@
 import { Router } from 'express';
-import { MongoCartManager } from '../controllers/cartManager.js';
+import { MongoCartManager } from '../DAL/cartManager.js';
 
 const router = Router();
 
 const cartManagerInstance = new MongoCartManager();
 
-// Endpoint POST /api/carts (Create a new cart) 
 router.post('/', (req, res) => {
   const newCart = cartManagerInstance.createCart();
   res.status(201).json(newCart);
 });
 
-// Endpoint GET using mongoose's POPULATE (/api/carts/:cid)
 router.get('/:cid', async (req, res) => {
   const cartId = req.params.cid;
   try {
@@ -22,7 +20,6 @@ router.get('/:cid', async (req, res) => {
   }
 });
 
-// Endpoint POST /api/carts/:cid/product/:pid (Add a product to the cart)
 router.post('/:cid/product/:pid', async (req, res) => {
   const cartId = req.params.cid; 
   const productId = req.params.pid; 
@@ -40,7 +37,6 @@ router.post('/:cid/product/:pid', async (req, res) => {
   res.json(cart);
 });
 
-// Endpoint DELETE /api/carts/:cid/product/:pid 
 router.delete('/:cid/product/:pid', async (req, res) => {
   const cartId = req.params.cid;
   const productId = req.params.pid;
@@ -56,7 +52,6 @@ router.delete('/:cid/product/:pid', async (req, res) => {
   }
 });
 
-// Endpoint DELETE /api/carts/:cid 
 router.delete('/:cid', async (req, res) => {
   const cartId = req.params.cid;
 
@@ -71,7 +66,6 @@ router.delete('/:cid', async (req, res) => {
   }
 });
 
-// Endpoint PUT /api/carts/:cid 
 router.put('/:cid', async (req, res) => {
   const cartId = req.params.cid;
   const newProducts = req.body.products;
@@ -89,7 +83,6 @@ router.put('/:cid', async (req, res) => {
   }
 });
 
-// Endpoint PUT /api/carts/:cid/product/:pid
 router.put('/:cid/product/:pid', async (req, res) => {
   const cartId = req.params.cid;
   const productId = req.params.pid;

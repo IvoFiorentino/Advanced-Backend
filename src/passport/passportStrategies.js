@@ -3,7 +3,7 @@ import  userModel from '../db/models/user.model.js'
 import { Strategy as LocalStrategy } from 'passport-local'
 import { Strategy as GithubStrategy } from 'passport-github2'
 import { compareData } from "../utils.js"
-import { usersManager } from "../controllers/usersManager.js"
+import { usersManager } from "../DAL/usersManager.js"
 
 // User => Serialize
 passport.serializeUser((user, done) => {
@@ -41,8 +41,8 @@ passport.use('login', new LocalStrategy(
 
 //Github Strategy    
 passport.use('github', new GithubStrategy({
-    //clientID: //INSERT ID CLIENT
-    //clientSecret: INSERT SECRET CLIENT
+    clientID: '98b7f9797c99115a817e',
+    clientSecret: 'db55a0604f27fcfe9ac693861e52f3c8674308e4',
     callbackURL: 'http://localhost:8080/api/session/githubcallback',
 },
 async function(accessToken, refreshToken, profile, done){

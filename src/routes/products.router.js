@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { MongoProductManager } from '../controllers/productManager.js';
+import { MongoProductManager } from '../DAL/productManager.js';
 
 const router = Router();
 

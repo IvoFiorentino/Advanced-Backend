@@ -1,8 +1,9 @@
 import mongoose from 'mongoose'
+import dotenv from 'dotenv'
+dotenv.config();
 
 //CONFIG MONGOOSE
-const URI = 'mongodb+srv://ivofiorentino0:vAUaOtrcWBzUJ5EG@ecommerceivof.jl3fssh.mongodb.net/EcommerceivoF?retryWrites=true&w=majority'
-mongoose.connect(URI)
+mongoose.connect(process.env.MONGO_URL)
 .then(()=> console.log('Connected to database'))
 .catch((error) => {
     console.error('fail to connect to database:', error);
