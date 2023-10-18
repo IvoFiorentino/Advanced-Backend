@@ -1,5 +1,11 @@
 import { Router } from 'express';
-import { MongoCartManager } from '../DAL/cartManager.js';
+import { MongoCartManager } from '../DATA/DAOs/cartsMongo.dao.js';
+import { isUser } from '../middlewares/auth.middlewares.js';
+import { cartService } from '../services/carts.service.js';
+import { productService } from '../services/product.service.js';
+import { ticketService } from '../services/ticket.service.js';
+import { generateUniqueCode } from '../utils/codeGenerator.js';
+import UsersDto from '../DATA/DTOs/users.dto.js';
 
 const router = Router();
 
@@ -20,9 +26,9 @@ router.get('/:cid', async (req, res) => {
   }
 });
 
-router.post('/:cid/product/:pid', async (req, res) => {
-  const cartId = req.params.cid; 
-  const productId = req.params.pid; 
+router.post('/:cid/product/:pid', isUser, async (req, res) => {
+  const cartId = req.params.cid;
+  const productId = req.params.pid;
   const { quantity } = req.body;
 
   if (!quantity || isNaN(quantity)) {
@@ -62,7 +68,7 @@ router.delete('/:cid', async (req, res) => {
     }
     res.json(cart);
   } catch (error) {
-    res.status(500).json({ error: 'Error removing all products from the cart' });
+    res.status(500).json({ error: 'Error clearing the cart' });
   }
 });
 
@@ -72,7 +78,7 @@ router.put('/:cid', async (req, res) => {
 
   try {
     console.log('New products received:', newProducts);
-    
+
     const cart = await cartManagerInstance.updateCart(cartId, newProducts);
 
     console.log('Cart updated:', cart);
@@ -95,7 +101,49 @@ router.put('/:cid/product/:pid', async (req, res) => {
     }
     res.json(cart);
   } catch (error) {
-    res.status(500).json({ error: 'Error updating the product quantity in the cart' });
+    res.status(500).json({ error: 'Error updating the quantity of products in the cart' });
+  }
+});
+
+router.post('/:cid/purchase', async (req, res) => {
+  const cartId = req.params.cid;
+
+  try {
+    const cart = await cartService.getCartById(cartId);
+    if (!cart) {
+      return res.status(404).json({ error: 'Cart not found' });
+    }
+    const productsNotPurchased = [];
+    for (const productInfo of cart.products) {
+      const product = await productService.getProductById(productInfo.product);
+      if (!product) {
+        return res.status(404).json({ error: 'Product not found' });
+      }
+      if (product.stock < productInfo.quantity) {
+        productsNotPurchased.push(productInfo.product);
+        continue;
+      } else {
+        product.stock -= productInfo.quantity;
+        await product.save();
+      }
+    }
+    cart.productsNotPurchased = productsNotPurchased;
+
+    await cartService.calculateTotalAmount(cart);
+
+    const ticketData = {
+      code: await generateUniqueCode(),
+      purchase_datetime: new Date(),
+      amount: cart.totalAmount,
+      purchaser: "LOURDES",
+    };
+    const ticket = await ticketService.createTicket(ticketData);
+
+    await cart.save();
+
+    res.status(201).json({ message: 'Purchase successful', ticket, notPurchasedProducts: productsNotPurchased });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 

@@ -1,57 +1,50 @@
 import express from 'express';
-import { MongoProductManager } from '../src/DAL/productManager.js';
-import productsRouter from '../src/routes/products.router.js'; 
+import { MongoProductManager } from './DATA/DAOs/productsMongo.dao.js';
+import productsRouter from '../src/routes/products.router.js';
 import cartsRouter from '../src/routes/carts.router.js';
-import { __dirname } from './utils.js'; 
-import handlebars from 'express-handlebars'; 
-import viewsRouter from './routes/views.router.js'; 
-import { Server } from 'socket.io'; 
-import '../src/db/dbConfig.js';
-import { Message } from '../src/db/models/messages.models.js';
-import sessionRouter from '../src/routes/sessions.router.js'; 
-import cookieParser from 'cookie-parser'; 
-import passport from 'passport'; 
-import './passport/passportStrategies.js';
-
-import config from './config.js';
-
+import { __dirname } from './bcrypt-helper.js';
+import handlebars from 'express-handlebars';
+import viewsRouter from './routes/views.router.js';
+import { Server } from 'socket.io';
+import './DATA/mongoDB/dbConfig.js';
+import { Message } from './DATA/mongoDB/models/messages.models.js';
+import sessionRouter from '../src/routes/sessions.router.js';
+import cookieParser from 'cookie-parser';
+import passport from 'passport';
+import './services/passport/passportStrategies.js';
+import { isUser } from './middlewares/auth.middlewares.js';
 import session from 'express-session';
-import FileStore from 'session-file-store'; 
-import MongoStore from 'connect-mongo'; 
+import FileStore from 'session-file-store';
+import MongoStore from 'connect-mongo';
+import config from './config.js';
+import mailsRouter from '../src/routes/mails.router.js';
 
-// SESSION CONFIGURATIONS 
 const fileStorage = FileStore(session);
-
-//APP CREATE
 const app = express();
+
+app.use(cookieParser());
+app.use(session({
+  store:MongoStore.create({
+    mongoUrl: config.mongoUrl,
+    mongoOptions: {useNewUrlParser: true, useUnifiedTopology: true},
+    ttl:50000,
+  }),
+  secret: config.sessionSecret,
+  resave: false,
+  saveUninitialized: false
+}));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(__dirname + '/public'));
 
-// CONFIGURE COOKIE PARSER + SESSIONS
-app.use(cookieParser());
-app.use(session({
-  store: MongoStore.create({
-    mongoUrl: 'mongodb+srv://ivofiorentino0:vAUaOtrcWBzUJ5EG@ecommerceivof.jl3fssh.mongodb.net/EcommerceivoF?retryWrites=true&w=majority',
-    mongoOptions: { useNewUrlParser: true, useUnifiedTopology: true },
-    ttl: 2000,
-  }),
-  secret: process.env.SESSION_SECRET,
-  resave: false,
-  saveUninitialized: false
-}));
-
-// PASSPORT CONFIGURATIONS
 app.use(passport.initialize());
 app.use(passport.session());
 
-// HANDLEBARS CONFIGURATIONS
 app.engine('handlebars', handlebars.engine());
 app.set('views', __dirname + '/views');
 app.set('view engine', 'handlebars');
 
-// Routes viewRouter
 app.use('/api/views', viewsRouter);
 app.use('/api/views/delete/:id', viewsRouter);
 
@@ -62,15 +55,21 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api/products', productsRouter);
-app.use('/api/views/products', productsRouter);
+app.use ('/api/views/products', productsRouter);
 
 app.use('/api/carts', cartsRouter);
 
-// app.get('/chat', (req, res) => {
-//   res.render('chat', { messages: [] });
-// });
+app.get('/chat', isUser, (req, res) => {
+  res.render('chat', { messages: [] });
+});
 
-app.use('/api/session', sessionRouter);
+app.use("/api/session", sessionRouter);
+app.use("/api/session/current", sessionRouter);
+
+app.use('/api/mail', mailsRouter);
+app.get('/api/mail', (req, res) => {
+  res.render('mail');
+});
 
 app.get('/login', (req, res) => {
   res.render('login');
@@ -86,14 +85,12 @@ app.get('/profile', (req, res) => {
   });
 });
 
-
-const httpServer = app.listen(process.env.PORT, () => {
-  console.log(`Listening on port ${process.env.PORT}`);
+const PORT = config.port;
+const httpServer = app.listen(PORT, () => {
+  console.log(`Listening on port ${PORT}`);
 });
 
-// Socket and events
 const socketServer = new Server(httpServer);
-
 socketServer.on('connection', (socket) => {
   console.log('Client connected', socket.id);
   socket.on('disconnect', () => {
@@ -115,10 +112,7 @@ socketServer.on('connection', (socket) => {
     const { user, message } = messageData;
     const newMessage = new Message({ user, message });
     await newMessage.save();
-
-    // Emit the message to all connected clients
     socketServer.emit('chatMessage', { user, message });
-
     console.log(`Message saved in the database: ${user}: ${message}`);
   });
 });

@@ -1,11 +1,11 @@
 import { Router } from "express";
-import { MongoProductManager } from '../DAL/productManager.js';
+import { MongoProductManager } from '../DATA/DAOs/productsMongo.dao.js';
+import { isAdmin } from '../middlewares/auth.middlewares.js';
 
 const router = Router();
 
 const productManagerInstance = new MongoProductManager();
 
-// Modified GET to comply with search methods as required by api/products
 router.get('/', async (req, res) => {
   try {
     const { limit = 10, page = 1, query, sort } = req.query;
@@ -44,14 +44,13 @@ router.get('/', async (req, res) => {
 
     res.json(response);
   } catch (error) {
-    res.status(500).json({ error: 'Error while obtaining the list of products' });
+    res.status(500).json({ error: 'Error getting the list of products' });
   }
 });
 
-// Endpoint GET /api/products/:pid (Retrieves a product by unique ID)
 router.get('/:pid', async (req, res) => {
   try {
-    const productId = req.params.pid; 
+    const productId = req.params.pid;
     const product = await productManagerInstance.getProductById(productId);
 
     if (!product) {
@@ -60,43 +59,40 @@ router.get('/:pid', async (req, res) => {
 
     res.json(product);
   } catch (error) {
-    res.status(500).json({ error: 'Error while obtaining the requested product' });
+    res.status(500).json({ error: 'Error getting the requested product' });
   }
 });
 
-// Endpoint POST /api/products (Allows adding a new product)
-router.post('/', (req, res) => {
+router.post('/', isAdmin, (req, res) => {
   const { title, description, code, price, stock, category, thumbnails } = req.body;
   const product = {
     title,
     description,
     code,
     price,
-    status: true, 
+    status: true,
     stock: stock,
     category,
-    thumbnails: thumbnails ? thumbnails.split(',') : [], 
+    thumbnails: thumbnails ? thumbnails.split(',') : [],
   };
 
   const newProduct = productManagerInstance.addProduct(product);
   if (newProduct) {
     res.status(201).json(newProduct);
   } else {
-    res.status(400).json({ error: 'Product could not be added' });
+    res.status(400).json({ error: 'Could not add the product' });
   }
 });
 
-// Endpoint PUT /api/products/:pid (Updates a product)
-router.put('/:pid', async (req, res) => {
-  const productId = req.params.pid; 
-  const updatedFields = req.body; 
+router.put('/:pid', isAdmin, async (req, res) => {
+  const productId = req.params.pid;
+  const updatedFields = req.body;
   await productManagerInstance.updateProduct(productId, updatedFields);
   res.json({ message: 'Product updated successfully' });
 });
 
-// Endpoint DELETE /api/products/:pid 
-router.delete('/:pid', async (req, res) => {
-  const productId = req.params.pid; 
+router.delete('/:pid', isAdmin, async (req, res) => {
+  const productId = req.params.pid;
   await productManagerInstance.deleteProduct(productId);
   res.json({ message: 'Product deleted successfully' });
 });

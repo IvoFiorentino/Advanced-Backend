@@ -1,20 +1,18 @@
-import dotenv from 'dotenv';
-dotenv.config();
-
 import { Router } from 'express';
-import userModel from '../db/models/user.model.js';
+import userModel from '../DATA/mongoDB/models/user.model.js';
 import passport from 'passport';
-// import { hashData } from '../utils.js';
 import bcrypt from 'bcrypt';
+import config from '../config.js';
+import UsersDto from '../DATA/DTOs/users.dto.js';
 
 const router = Router();
 
 router.post('/register', async (req, res) => {
     const { first_name, last_name, email, age, password } = req.body;
 
-    const exists = await userModel.findOne({ email });
+    const exist = await userModel.findOne({ email });
 
-    if (exists) {
+    if (exist) {
         return res.status(400).send({ status: "error", error: "User already exists" });
     }
 
@@ -29,31 +27,28 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
-    const user = await userModel.findOne({ email });
+    const user = await userModel.findOne({ email })
 
     if (!user) {
-        return res.status(400).send({ status: "error", error: "Incorrect data" })
+        return res.status(400).send({ status: "error", error: "Incorrect data" });
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid && password === user.password) {
-
     } else if (!isPasswordValid) {
         return res.status(400).send({ status: "error", error: "Incorrect data" });
     }
 
-    if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
+    if (email === config.adminEmail && password === config.adminPassword) {
         user.role = 'ADMIN';
     }
-
     req.session.user = {
         name: `${user.first_name} ${user.last_name}`,
         email: user.email,
         age: user.age,
-        role: user.role, 
+        role: user.role,
     }
-
     res.redirect('/api/views/products');
 })
 
@@ -64,13 +59,15 @@ router.get('/logout', (req, res) => {
     })
 })
 
-// Calling GitHub for redirection and for the callback
-
 router.get('/github', passport.authenticate('github', { scope: ['user:email'] }), async (req, res) => { })
-
 router.get('/githubcallback', passport.authenticate('github', { failureRedirect: '/login' }), async (req, res) => {
     req.session.user = req.user
     res.redirect('/profile')
 })
+
+router.get('/current', (req, res) => {
+    const userDto = new UsersDto(req.session.user);
+    res.status(200).json({ user: userDto });
+});
 
 export default router;

@@ -6,21 +6,27 @@ const collection = 'User';
 const schema = new mongoose.Schema({
   first_name: String,
   last_name: String,
-  email: String,
+  email: {
+    type: String,
+    unique: true,
+  },
   age: Number,
   password: String,
   username: String,
+  cart: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Cart',
+  },
   role: {
     type: String,
-    default: 'user', 
+    default: 'user',
   },
   fromGithub: {
     type: Boolean,
-    default: false, 
+    default: false,
   },
 });
 
-// Method to hash the password before saving it to the database
 schema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
   try {
