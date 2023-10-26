@@ -1,4 +1,6 @@
 import { MongoProductManager } from '../DATA/DAOs/productsMongo.dao.js';
+import { ErrorMessages } from '../errors/errorNum.js';
+import CustomError from '../errors/customErrors.js';
 
 class ProductService {
   constructor() {
@@ -10,7 +12,8 @@ class ProductService {
       const newProduct = await this.productManager.addProduct(product);
       return newProduct;
     } catch (error) {
-      throw new Error('Error when trying to add the product');
+      const customError = CustomError.createError(ErrorMessages.ADD_PRODUCT_ERROR);
+      return res.status(customError.status).json(customError);
     }
   }
 
@@ -19,7 +22,8 @@ class ProductService {
       const products = await this.productManager.getProducts(queryOptions, sortOptions, limit, page);
       return products;
     } catch (error) {
-      throw new Error('Error when getting products');
+      const customError = CustomError.createError(ErrorMessages.GET_PRODUCTS_ERROR)
+      return res.status(customError.status).json(customError);
     }
   }
 
@@ -28,7 +32,8 @@ class ProductService {
       const product = await this.productManager.getProductById(id);
       return product;
     } catch (error) {
-      throw new Error('Error when getting the product by ID');
+      const customError = CustomError.createError(ErrorMessages.PRODUCT_NOT_FOUND)
+      return res.status(customError.status).json(customError);
     }
   }
 
@@ -37,7 +42,7 @@ class ProductService {
       const updatedProduct = await this.productManager.updateProduct(id, updatedFields);
       return updatedProduct;
     } catch (error) {
-      throw new Error('Error when updating the product');
+      throw new Error('Error while deleting the product');
     }
   }
 
@@ -46,9 +51,11 @@ class ProductService {
       const deletedProduct = await this.productManager.deleteProduct(id);
       return deletedProduct;
     } catch (error) {
-      throw new Error('Error when deleting the product');
+      throw new Error('Error while deleting the product');
     }
   }
+
 }
 
-export const productService = new ProductService();
+
+export const productService = new ProductService();;

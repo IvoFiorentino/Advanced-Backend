@@ -18,6 +18,7 @@ import FileStore from 'session-file-store';
 import MongoStore from 'connect-mongo';
 import config from './config.js';
 import mailsRouter from '../src/routes/mails.router.js';
+import {generateFakeProducts} from './mocks/productsMock.js'
 
 const fileStorage = FileStore(session);
 const app = express();
@@ -56,6 +57,15 @@ app.get('/', (req, res) => {
 
 app.use('/api/products', productsRouter);
 app.use ('/api/views/products', productsRouter);
+
+app.get('/api/mockingproducts', (req, res) => {
+  const fakeProducts = [];
+  for (let i = 0; i < 100; i++) {
+      const productMock = generateFakeProducts(); 
+      fakeProducts.push(productMock);
+  }
+  res.json(fakeProducts);
+});
 
 app.use('/api/carts', cartsRouter);
 

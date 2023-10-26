@@ -1,5 +1,8 @@
 import { MongoCartManager } from '../DATA/DAOs/cartsMongo.dao.js';
 import { productService } from './product.service.js';
+import { ErrorMessages } from '../errors/errorNum.js';
+import CustomError from '../errors/customErrors.js';
+
 
 class CartService {
   constructor() {
@@ -11,7 +14,7 @@ class CartService {
       const newCart = await this.cartManager.createCart();
       return { message: 'Cart created', cart: newCart };
     } catch (error) {
-      throw new Error('Error when trying to create the cart');
+      throw new Error('Error creating the cart');
     }
   }
 
@@ -20,7 +23,8 @@ class CartService {
       const cart = await this.cartManager.getCartById(cartId);
       return cart;
     } catch (error) {
-      throw new Error('Error when getting the cart');
+      const customError = CustomError.createError(ErrorMessages.CART_NOT_FOUND);
+      res.status(customError.status).json(customError);
     }
   }
 
@@ -29,7 +33,8 @@ class CartService {
       const cart = await this.cartManager.addProductToCart(cartId, productId, quantity);
       return this.calculateTotalAmount(cart);
     } catch (error) {
-      throw new Error('Error when adding the product to the cart');
+      const customError = CustomError.createError(ErrorMessages.CART_NOT_FOUND);
+      return res.status(customError.status).json(customError);
     }
   }
 
@@ -38,7 +43,8 @@ class CartService {
       const cart = await this.cartManager.removeProductFromCart(cartId, productId);
       return { message: 'Product removed from the cart', cart };
     } catch (error) {
-      throw new Error('Error when removing the product from the cart');
+      const customError = CustomError.createError(ErrorMessages.REMOVE_FROM_CART_ERROR);
+      return res.status(customError.status).json(customError);
     }
   }
 
@@ -47,7 +53,7 @@ class CartService {
       const cart = await this.cartManager.updateCart(cartId, newProducts);
       return { message: 'Cart updated', cart };
     } catch (error) {
-      throw new Error('Error when updating the cart');
+      throw new Error('Error updating the cart');
     }
   }
 
@@ -56,7 +62,7 @@ class CartService {
       const cart = await this.cartManager.updateProductQuantity(cartId, productId, newQuantity);
       return { message: 'Quantity updated', cart };
     } catch (error) {
-      throw new Error('Error when updating the product quantity in the cart');
+      throw new Error('Error updating the quantity of the product in the cart');
     }
   }
 
@@ -65,7 +71,8 @@ class CartService {
       const cart = await this.cartManager.clearCart(cartId);
       return { message: 'All products have been removed from the cart', cart };
     } catch (error) {
-      throw new Error('Error when clearing the cart');
+      const customError = CustomError.createError(ErrorMessages.CLEAR_CART_ERROR);
+      return res.status(customError.status).json(customError);
     }
   }
 
@@ -74,7 +81,7 @@ class CartService {
       const cart = await this.cartManager.getPopulatedCartById(cartId);
       return { success: true, message: 'Cart retrieved successfully', cart };
     } catch (error) {
-      throw new Error('Error getting the cart');
+      throw new Error('Error retrieving the cart');
     }
   }
 
@@ -83,22 +90,22 @@ class CartService {
       if (!cart) {
         throw new Error('Cart not found');
       }
-  
+
       let totalAmount = 0;
-  
+
       for (const productInfo of cart.products) {
         const product = await productService.getProductById(productInfo.product);
         if (product) {
           totalAmount += product.price * productInfo.quantity;
         }
       }
-  
+
       cart.totalAmount = totalAmount;
       await this.cartManager.saveCart(cart);
-  
+
       return cart;
     } catch (error) {
-      throw new Error('Error when calculating the total: ' + error.message);
+      throw new Error('Error calculating the total: ' + error.message);
     }
   }
 }
