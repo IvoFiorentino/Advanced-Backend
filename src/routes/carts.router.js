@@ -6,6 +6,8 @@ import { productService } from '../services/product.service.js';
 import { ticketService } from '../services/ticket.service.js';
 import { generateUniqueCode } from '../utils/codeGenerator.js';
 import UsersDto from '../DATA/DTOs/users.dto.js';
+import { ErrorMessages } from '../errors/errorNum.js';
+import CustomError from '../errors/customErrors.js';
 
 const router = Router();
 
@@ -22,7 +24,8 @@ router.get('/:cid', async (req, res) => {
     const cart = await cartManagerInstance.getPopulatedCartById(cartId);
     res.json(cart.products);
   } catch (error) {
-    res.status(404).json({ error: 'Cart not found' });
+    const customError = CustomError.createError(ErrorMessages.CART_NOT_FOUND);
+    return res.status(customError.status).json(customError);
   }
 });
 
@@ -32,14 +35,15 @@ router.post('/:cid/product/:pid', isUser, async (req, res) => {
   const { quantity } = req.body;
 
   if (!quantity || isNaN(quantity)) {
-    return res.status(400).json({ error: 'Invalid quantity' });
+    const customError = CustomError.createError(ErrorMessages.QUANTITY_NOT_VALID);
+    return res.status(customError.status).json(customError);
   }
 
   const cart = cartManagerInstance.addProductToCart(cartId, productId, quantity);
   if (!cart) {
-    return res.status(404).json({ error: 'Cart not found' });
+    const customError = CustomError.createError(ErrorMessages.CART_NOT_FOUND);
+    return res.status(customError.status).json(customError);
   }
-
   res.json(cart);
 });
 
@@ -50,11 +54,13 @@ router.delete('/:cid/product/:pid', async (req, res) => {
   try {
     const cart = await cartManagerInstance.removeProductFromCart(cartId, productId);
     if (!cart) {
-      return res.status(404).json({ error: 'Cart not found' });
+      const customError = CustomError.createError(ErrorMessages.CART_NOT_FOUND);
+      return res.status(customError.status).json(customError);
     }
     res.json(cart);
   } catch (error) {
-    res.status(500).json({ error: 'Error removing the product from the cart' });
+    const customError = CustomError.createError(ErrorMessages.REMOVE_FROM_CART_ERROR);
+    return res.status(customError.status).json(customError);
   }
 });
 
@@ -64,11 +70,13 @@ router.delete('/:cid', async (req, res) => {
   try {
     const cart = await cartManagerInstance.clearCart(cartId);
     if (!cart) {
-      return res.status(404).json({ error: 'Cart not found' });
+      const customError = CustomError.createError(ErrorMessages.CART_NOT_FOUND);
+      return res.status(customError.status).json(customError);
     }
     res.json(cart);
   } catch (error) {
-    res.status(500).json({ error: 'Error clearing the cart' });
+    const customError = CustomError.createError(ErrorMessages.CLEAR_CART_ERROR);
+    return res.status(customError.status).json(customError);
   }
 });
 
@@ -78,13 +86,12 @@ router.put('/:cid', async (req, res) => {
 
   try {
     console.log('New products received:', newProducts);
-
+    
     const cart = await cartManagerInstance.updateCart(cartId, newProducts);
 
     console.log('Cart updated:', cart);
     res.json(cart);
   } catch (error) {
-    console.error('Error:', error);
     res.status(500).json({ error: 'Error updating the cart' });
   }
 });
@@ -114,6 +121,7 @@ router.post('/:cid/purchase', async (req, res) => {
       return res.status(404).json({ error: 'Cart not found' });
     }
     const productsNotPurchased = [];
+
     for (const productInfo of cart.products) {
       const product = await productService.getProductById(productInfo.product);
       if (!product) {
@@ -129,19 +137,22 @@ router.post('/:cid/purchase', async (req, res) => {
     }
     cart.productsNotPurchased = productsNotPurchased;
 
-    await cartService.calculateTotalAmount(cart);
+    const userDto = req.session.user;
+    if (!userDto || !userDto.email) {
+    return res.status(401).json({ error: 'Unauthenticated user or missing email' });
+    }
 
     const ticketData = {
       code: await generateUniqueCode(),
       purchase_datetime: new Date(),
       amount: cart.totalAmount,
-      purchaser: "LOURDES",
+      purchaser: "IVO",
     };
     const ticket = await ticketService.createTicket(ticketData);
 
     await cart.save();
 
-    res.status(201).json({ message: 'Purchase successful', ticket, notPurchasedProducts: productsNotPurchased });
+    res.status(201).json({ message: 'Successful purchase', ticket, notPurchasedProducts: productsNotPurchased });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
