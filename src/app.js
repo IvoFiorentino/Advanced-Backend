@@ -7,7 +7,7 @@ import handlebars from 'express-handlebars';
 import viewsRouter from './routes/views.router.js';
 import { Server } from 'socket.io';
 import './DATA/mongoDB/dbConfig.js';
-import { Message } from './DATA/mongoDB/models/messages.models.js';
+import { Message } from './DATA/mongoDB/models/messages.model.js';
 import sessionRouter from '../src/routes/sessions.router.js';
 import cookieParser from 'cookie-parser';
 import passport from 'passport';
