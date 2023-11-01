@@ -19,6 +19,7 @@ import MongoStore from 'connect-mongo';
 import config from './config.js';
 import mailsRouter from '../src/routes/mails.router.js';
 import {generateFakeProducts} from './mocks/productsMock.js'
+import logger from '../src/winston.js';
 
 const fileStorage = FileStore(session);
 const app = express();
@@ -93,6 +94,21 @@ app.get('/profile', (req, res) => {
   res.render('profile', {
     user: req.session.user,
   });
+});
+
+//CLASS 34 CHALLENGE
+app.get('/loggerTest', (req, res) => {
+  logger.debug('Testing debug-level message');
+  logger.http('Testing http-level message');
+  logger.info('Testing info-level message');
+  logger.warning('Testing warning-level message');
+  logger.error('Testing error-level message');
+  logger.fatal('Testing fatal-level message');
+  res.send('Logs generated from the /loggerTest endpoint');
+});
+
+app.get('/generateError', (req, res) => {
+  throw new Error('This is an intentional test error');
 });
 
 const PORT = config.port;

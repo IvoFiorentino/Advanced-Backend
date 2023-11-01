@@ -1,8 +1,8 @@
 import { MongoCartManager } from '../DATA/DAOs/cartsMongo.dao.js';
 import { productService } from './product.service.js';
-import { ErrorMessages } from '../errors/errorNum.js';
 import CustomError from '../errors/customErrors.js';
-
+import { ErrorMessages } from '../errors/errorNum.js';
+import logger from '../winston.js'
 
 class CartService {
   constructor() {
@@ -14,7 +14,7 @@ class CartService {
       const newCart = await this.cartManager.createCart();
       return { message: 'Cart created', cart: newCart };
     } catch (error) {
-      throw new Error('Error creating the cart');
+      throw new Error('Error while trying to create the cart');
     }
   }
 
@@ -53,7 +53,7 @@ class CartService {
       const cart = await this.cartManager.updateCart(cartId, newProducts);
       return { message: 'Cart updated', cart };
     } catch (error) {
-      throw new Error('Error updating the cart');
+      throw new Error('Error while updating the cart');
     }
   }
 
@@ -62,14 +62,14 @@ class CartService {
       const cart = await this.cartManager.updateProductQuantity(cartId, productId, newQuantity);
       return { message: 'Quantity updated', cart };
     } catch (error) {
-      throw new Error('Error updating the quantity of the product in the cart');
+      throw new Error('Error while updating the quantity of the product in the cart');
     }
   }
 
   async clearCart(cartId) {
     try {
       const cart = await this.cartManager.clearCart(cartId);
-      return { message: 'All products have been removed from the cart', cart };
+      return { message: 'All products in the cart have been removed', cart };
     } catch (error) {
       const customError = CustomError.createError(ErrorMessages.CLEAR_CART_ERROR);
       return res.status(customError.status).json(customError);
@@ -81,7 +81,7 @@ class CartService {
       const cart = await this.cartManager.getPopulatedCartById(cartId);
       return { success: true, message: 'Cart retrieved successfully', cart };
     } catch (error) {
-      throw new Error('Error retrieving the cart');
+      throw new Error('Error while retrieving the cart');
     }
   }
 
@@ -105,7 +105,7 @@ class CartService {
 
       return cart;
     } catch (error) {
-      throw new Error('Error calculating the total: ' + error.message);
+      throw new Error('Error while calculating the total: ' + error.message);
     }
   }
 }
