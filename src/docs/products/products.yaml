@@ -1,0 +1,157 @@
+openapi: 3.0.1
+info:
+  title: IVOF ECOMMERCE Documentation - Products
+  description: Information about methods/functionalities applied in IVOF ECOMMERCE for products
+
+paths:
+  /api/products:
+    post:
+      summary: Create a new product
+      parameters:
+        - in: body
+          name: product
+          required: true
+          description: Data of the product to create
+          schema:
+            type: object
+            properties:
+              title:
+                type: string
+              description:
+                type: string
+              code:
+                type: string
+              price:
+                type: number
+              stock:
+                type: number
+              category:
+                type: string
+              thumbnails:
+                type: array
+                items:
+                  type: string
+      responses:
+        '201':
+          description: Product created successfully
+          content:
+            application/json:
+              example: { "message": "Product created successfully" }
+        '400':
+          description: Missing required fields
+          content:
+            application/json:
+              example: { "error": "Missing required fields", "details": ["title (of type String) is required"] }
+        '403':
+          description: Unauthorized access
+        '500':
+          description: Error creating the product
+
+    get:
+      summary: Get list of products
+      parameters:
+        - name: limit
+          in: query
+          description: Results limit per page
+          schema:
+            type: integer
+        - name: page
+          in: query
+          description: Page number
+          schema:
+            type: integer
+        - name: query
+          in: query
+          description: Search by title or category
+          schema:
+            type: string
+        - name: sort
+          in: query
+          description: Sort results ('asc' or 'desc')
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of products obtained successfully
+        '500':
+          description: Error getting the list of products
+
+  /api/products/{pid}:
+    get:
+      summary: Get a product by its ID
+      parameters:
+        - name: pid
+          in: path
+          required: true
+          description: Unique ID of the product
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Product obtained successfully
+          content:
+            application/json:
+              example: {
+                "_id":"64e9220b68adf4f30a8af768",
+                "title":"Orbis Oven",
+                "description":"Oven Orbis distributor",
+                "code":"RCSIAMESE000",
+                "price":200000,
+                "stock":20,
+                "category":"Cook",
+                "thumbnails":[],
+                "__v":0
+              }
+        '404':
+          description: Product not found
+ 
+    put:
+      summary: Update a product
+      parameters:
+        - name: pid
+          in: path
+          required: true
+          description: Unique ID of the product to update
+          schema:
+            type: string
+
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example: { "title": "New title" }
+      responses:
+        '200':
+          description: Product updated successfully
+          content:
+            application/json:
+              example: { "message": "Product updated successfully" }
+        '404':
+          description: Product not found
+        '403':
+          description: Unauthorized access
+        '500':
+          description: Error updating the product
+          
+    delete:
+      summary: Delete a product by unique ID
+      parameters:
+        - name: pid
+          in: path
+          required: true
+          description: Unique ID of the product to delete
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Product deleted successfully
+          content:
+            application/json:
+              example: { "message": "Product deleted successfully" }
+        '404':
+          description: Product not found
+        '403':
+          description: Unauthorized access
+        '500':
+          description: Error deleting the product

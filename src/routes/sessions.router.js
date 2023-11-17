@@ -70,4 +70,21 @@ router.get('/current', (req, res) => {
     res.status(200).json({ user: userDto });
 });
 
+router.put('/users/premium/:uid', async (req, res) => {
+    try {
+        const uid = req.params.uid;
+        const user = await userModel.findOne({ _id: uid });
+
+        if (!user) {
+            return res.status(404).json({ status: "error", error: "User not found" });
+        } 
+        // Change the role from "user" to "premium" or vice versa depending on the base role
+        user.role = user.role === "user" ? "premium" : "user";
+        await user.save();
+        return res.status(200).json({ status: "success", message: `Role of user ${user.email} updated to ${user.role}` });
+    } catch (error) {
+        return res.status(500).json({ status: "error", error: "Error updating user role" });
+    }
+});
+
 export default router;

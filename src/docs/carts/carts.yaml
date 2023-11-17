@@ -1,0 +1,186 @@
+openapi: 3.0.1
+info:
+  title: IVOF ECOMMERCE Documentation - CARTS
+  description: Information about methods/functionalities applied in IVOF ECOMMERCE
+
+paths:
+  /api/carts:
+    post:
+      summary: Create a new cart
+      responses:
+        '201':
+          description: Cart created successfully
+        '500':
+           description: Error creating the cart
+
+  /api/carts/{cid}:
+    get:
+      summary: Get a cart by its ID
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: Unique cart ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Cart found - Shows the products it contains, if any
+          content:
+            application/json:
+              example: { "products": [] }
+        '404':
+          description: Cart not found
+
+    delete:
+      summary: Delete all products from a cart by passing its ID
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: Unique cart ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Cart deleted successfully
+        '404':
+          description: Cart not found
+
+    put:
+      summary: Update a cart with a new array of products
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: Unique cart ID
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                products:
+                  type: array
+                  items:
+                    type: object
+              example: {"products": []}
+      responses:
+        '200':
+          description: Cart updated successfully
+        '404':
+          description: Cart not found
+
+  /api/carts/{cid}/product/{pid}:
+    post:
+      summary: Add a product to a cart
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: Unique cart ID
+          schema:
+            type: string
+        - name: pid
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                quantity:
+                  type: number
+              example: { "quantity": 3 }
+      responses:
+        '200':
+          description: Product added to the cart successfully
+        '404':
+          description: Cart not found
+        '500':
+          description: Invalid quantity
+
+    put:
+      summary: Update the quantity of a specific product in a cart
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: Unique cart ID
+          schema:
+            type: string
+        - name: pid
+          in: path
+          required: true
+          description: Product identifier ID
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example: { "quantity": 3 }
+      responses:
+        '200':
+          description: Product quantity updated successfully
+        '404':
+          description: Cart not found
+        '500':
+          description: Error updating the quantity of products in the cart
+
+    delete:
+      summary: Delete a product from a cart
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: Unique cart ID
+          schema:
+            type: string
+        - name: pid
+          in: path
+          required: true
+          description: Product identifier ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Product deleted from the cart successfully
+        '404':
+          description: Cart not found
+        '500':
+          description: Error deleting the product
+
+  /api/carts/{cid}/purchase:
+    post:
+      summary: Make a purchase
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: Unique cart ID
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Purchase successful
+          content:
+            application/json:
+              example: { 
+                "message": "Purchase successful", 
+                "ticket": 
+                { "code": "123", 
+                "purchase_datetime": "2023-11-15T00:00:00Z",
+                 "amount": 50000, 
+                 "purchaser": "IVO" },
+                 "notPurchasedProducts": [] }
+        '404':
+          description: Cart not found
+        '500':
+          description: Error making the purchase

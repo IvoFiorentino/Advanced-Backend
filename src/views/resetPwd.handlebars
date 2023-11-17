@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reset Password</title>
+</head>
+
+<body>
+    <h1>Reset Password</h1>
+    
+    {{#if error}}
+        <p class="error">{{error}}</p>
+    {{/if}}
+
+    <form action="/api/reset-pwd" method="POST">
+        <label>Enter your new password:</label>
+        <input type="password" name="password" required>
+        <button type="submit">RESET</button>
+        <input type="hidden" name="token" value="{{token}}">
+    </form>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/index.js"></script>
+</body>
+
+</html>

@@ -16,7 +16,6 @@ class CartController {
 
     try {
       const cart = await cartService.addProductToCart(cartId, productId, quantity);
-      // Calculate the totalAmount
       const updatedCart = await cartService.calculateTotalAmount(cart);
       res.status(200).json({ cart: updatedCart });
     } catch (error) {

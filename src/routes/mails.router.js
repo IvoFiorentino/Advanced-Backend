@@ -9,14 +9,16 @@ router.get("/api/mail", async (req, res)=>{
         subject: "THANK YOU FOR YOUR PURCHASE",
         text: "You will soon receive your products!",
     };
-    try {
-        await transporter.sendMail(messageOpt);
-        res.send("Message sent");
-        res.redirect("/api/mail");
-    } catch (error) {
-        console.error("Error sending the email:", error);
-        res.send("Error sending the email.");
-    }
+    // try {
+    //     await transporter.sendMail(messageOpt);
+    //     res.send("Message sent");
+    //     res.redirect("/api/mail");
+    // } catch (error) {
+    //     console.error("Error sending the email:", error);
+    //     res.send("Error sending the email.");
+    // }
+    await transporter.sendMail(messageOpt);
+    res.send('Email sended correctly!') 
 });
 
 export default router;
